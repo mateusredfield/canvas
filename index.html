@@ -43,13 +43,17 @@ var canvasContext;
 var canvasWidth;
 var canvasHeight;
 var x = 0;
+var initialMove = [];
+initialMove["none"] = 1; 
+var possibleMoves = []
+//parei aqui vetor de movimntos
 
 var idleState1 = {
         x: 50,
         y: 50,
         width: 50,
         height: 50,
-        direction: "none"
+        directions: [["none", "up", "down", "left", "right"],[1, 0, 0, 0, 0]] 
 }
 
 var idleState2 = {
@@ -57,7 +61,7 @@ var idleState2 = {
         y: 50,
         width: 50,
         height: 50,
-        direction: "none"
+        directions: [["none", "up", "down", "left", "right"],[1, 0, 0, 0, 0]]
 }
 
 var objs = [idleState1, idleState2]
@@ -69,15 +73,32 @@ const activeKeyNotifier = {
         "ArrowRight"    : ArrowRight
 }
 
-document.addEventListener('keydown', observadorTeclas, false)
+const deactiveKeyNotifier = {
+        "ArrowUp"       : ArrowUpRelease,
+        "ArrowDown"     : ArrowDownRelease,
+        "ArrowLeft"     : ArrowLeftRelease,
+        "ArrowRight"    : ArrowRightRelease
+}
 
-function observadorTeclas(e){
+document.addEventListener('keydown', observadorTeclasDown, false)
+document.addEventListener('keyup', observadorTeclasUp, false)
+
+function observadorTeclasDown(e){
     keysManipulator(e.key);
+}
+
+function observadorTeclasUp(e){
+    keysReleaseManipulator(e.key);
 }
 
 function keysManipulator(key){
     console.log(key);
     activeKeyNotifier[key](idleState1);
+}
+
+function keysReleaseManipulator(key){
+    console.log("Soltou " + key);
+    deactiveKeyNotifier[key](idleState1);
 }
 
 function startAnimation(){
@@ -107,15 +128,23 @@ function drawSquare(obj){
     canvasContext.fillRect(x, y, width, height);
 }
 
+// A logica de arrow up e down poderia ser melhor com uma lista de teclas pressionadas e soltas num dado intervalo
+function ArrowUp(obj){ obj.directions["up"] = 1; }
+function ArrowDown(obj){ obj.directions["down"] = 1; }
+function ArrowLeft(obj){ obj.directions["left"] = 1; }
+function ArrowRight(obj){ obj.directions["right"] = 1; }
 
-function ArrowUp(obj){ obj.direction = "up"; }
-function ArrowDown(obj){ obj.direction = "down"; }
-function ArrowLeft(obj){ obj.direction = "left"; }
-function ArrowRight(obj){ obj.direction = "right"; }
+function ArrowUpRelease(obj){ obj.directions["up"] = 0; }
+function ArrowDownRelease(obj){ obj.directions["down"] = 0; }
+function ArrowLeftRelease(obj){ obj.directions["left"] = 0; }
+function ArrowRightRelease(obj){ obj.directions["right"] = 0; }
 
 
 function articulateMove(obj){
-    moves[obj.direction](obj);
+    //moves[obj.direction](obj);
+    for(var i = 1; i < obj.directions.length; i++){
+        moves[obj.directions[i]]
+    }
 }
 
 const moves = {
@@ -150,11 +179,14 @@ function logicalLoop(objs){
         <canvas id="canvas">
         </canvas>
     </div>
-    <button onclick="moveUp(idleState1)">Up</button> | 
-    <button onclick="moveDown(idleState1)">Down</button> |
-    <button onclick="moveLeft(idleState1)">Left</button> |
-    <button onclick="moveRight(idleState1)">Right</button>
+    <div align="center">
+        <button onclick="moveUp(idleState1)">Up</button> | 
+        <button onclick="moveDown(idleState1)">Down</button> |
+        <button onclick="moveLeft(idleState1)">Left</button> |
+        <button onclick="moveRight(idleState1)">Right</button>
+    </div>
     <br>
+    </body>
     <div id="dumpVar"></div>
     
 </body>
