@@ -43,6 +43,8 @@ var possibleMoves = [];
 var idleState1;
 var idleState2;
 var objs = [];
+var estadoAtual = 0;
+var estados = ["telaInicial", "posTelaInicial"];
 
 var idleState1 = {
     x: 50,
@@ -174,6 +176,8 @@ function drawSquare(obj){
 //********************* Animacao Central *********************
 //loop animacao - um apenas starta com algumas medidas e alocacaoes e a outra funcao q eh o loop em si
 function startAnimation(){
+
+    ++estadoAtual;
     canvas = document.getElementById('canvas');
     canvasContext = canvas.getContext('2d');
     canvasWidth = canvas.width = 350;
@@ -191,10 +195,19 @@ function animate(){
 }
 //******************* End Animacao Central *******************
 
+
+//*************** Funcoes de proposito Geral *******************
+function tryFunction(funcao){
+    if( estados[estadoAtual].indexOf(funcao) > -1){
+        funcao();
+    }
+}
+//********************* End Funcoes Geral **********************
+
 </script>
 
 <body>
-    <div onclick="startAnimation()" class="areaCanvas">
+    <div onclick="tryFunction(startAnimation)" class="areaCanvas">
         <canvas id="canvas">
         </canvas>
     </div>
