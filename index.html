@@ -16,13 +16,6 @@ html, body{
     padding: 0px;
 }
 
-.fodasse{
-    text-align:center; 
-    width: calc(100vw - (100vw - 100%)); 
-    height:100vh;
-    background-color: blue;
-}
-
 .areaCanvas{
     margin-top: 30px;
     margin-left: auto !important;
@@ -38,15 +31,18 @@ html, body{
 
 <script>
 
+document.addEventListener('keydown', observadorTeclasDown, false)
+document.addEventListener('keyup', observadorTeclasUp, false)
+
 var canvas;
 var canvasContext;
 var canvasWidth;
 var canvasHeight;
 var x = 0;
-var initialMove = [];
-initialMove["none"] = 1; 
-var possibleMoves = []
-//parei aqui vetor de movimntos
+var possibleMoves = [];
+var idleState1;
+var idleState2;
+var objs = [];
 
 var idleState1 = {
     x: 50,
@@ -76,8 +72,9 @@ var idleState2 = {
     }
 }
 
-var objs = [idleState1, idleState2]
+objs = [idleState1, idleState2];
 
+//************************* Trecho de Movimentacao ***********************
 const activeKeyNotifier = {
     "ArrowUp"       : ArrowUp,
     "ArrowDown"     : ArrowDown,
@@ -92,9 +89,16 @@ const deactiveKeyNotifier = {
     "ArrowRight"    : ArrowRightRelease
 }
 
-document.addEventListener('keydown', observadorTeclasDown, false)
-document.addEventListener('keyup', observadorTeclasUp, false)
+//lista de movimentos possiveis
+const moves = {
+    "up": moveUp,
+    "down": moveDown,
+    "left": moveLeft,
+    "right": moveRight,
+    "none" : moveIdle
+}
 
+//obervadores e manipuladores de valores de entrada
 function observadorTeclasDown(e){
     keysManipulator(e.key);
 }
@@ -105,14 +109,70 @@ function observadorTeclasUp(e){
 
 function keysManipulator(key){
     console.log(key);
-    activeKeyNotifier[key](idleState1);
+    activeKeyNotifier.hasOwnProperty(key) ? activeKeyNotifier[key](idleState1) : console.log("null") ;
 }
 
 function keysReleaseManipulator(key){
     console.log("Soltou " + key);
-    deactiveKeyNotifier[key](idleState1);
+    deactiveKeyNotifier.hasOwnProperty(key) ? deactiveKeyNotifier[key](idleState1) : console.log("null") ;
 }
 
+//seta direcao e caso sim articula chama funcao de mover/fazer movimento
+//manipuladores de direcao, no caso de haver direcao, a funcao de articulacao eh responsavel por ver quais direcoes
+//foram escolhidsa e chama o metodo de execucao de movimento
+// A logica de arrow up e down poderia ser melhor com uma lista de teclas pressionadas e soltas num dado intervalo
+function ArrowUp(obj){ obj.directions["up"] = 1; }
+function ArrowDown(obj){ obj.directions["down"] = 1; }
+function ArrowLeft(obj){ obj.directions["left"] = 1; }
+function ArrowRight(obj){ obj.directions["right"] = 1; }
+
+function ArrowUpRelease(obj){ obj.directions["up"] = 0; }
+function ArrowDownRelease(obj){ obj.directions["down"] = 0; }
+function ArrowLeftRelease(obj){ obj.directions["left"] = 0; }
+function ArrowRightRelease(obj){ obj.directions["right"] = 0; }
+
+
+function moveUp(obj){ obj.y = obj.y - 1; }
+function moveDown(obj){ obj.y = obj.y + 1; }
+function moveLeft(obj){obj.x = obj.x - 1;}
+function moveRight(obj){obj.x = obj.x + 1;}
+function moveIdle(obj){return;}
+
+function articulateMove(obj){
+
+    for(let key in obj.directions){ 
+        if(obj.directions[key] == 1){ moves[key](obj) } 
+    }
+}
+
+//Metodo a ser inserido no loop central de animacao geral
+function logicalLoop(objs){
+    for(var i = 0; i < objs.length; i++) articulateMove(objs[i])
+}
+
+//********************** End Movimentacao **********************
+
+
+
+
+
+
+//********************* Trecho de Animacao *********************
+function drawSquare(obj){
+
+    var x = obj.x;
+    var y = obj.y;
+    var width = obj.width;
+    var height = obj.height;
+
+    canvasContext.fillRect(x, y, width, height);
+}
+//********************* End Animacao *********************
+
+
+
+//********************* Animacao Central *********************
+//loop animacao - um apenas starta com algumas medidas e alocacaoes e a outra funcao q eh o loop em si
 function startAnimation(){
     canvas = document.getElementById('canvas');
     canvasContext = canvas.getContext('2d');
@@ -129,60 +189,7 @@ function animate(){
     drawSquare(idleState2);
     requestAnimationFrame(animate);
 }
-
-function drawSquare(obj){
-
-    var x = obj.x;
-    var y = obj.y;
-    var width = obj.width;
-    var height = obj.height;
-
-    canvasContext.fillRect(x, y, width, height);
-}
-
-// A logica de arrow up e down poderia ser melhor com uma lista de teclas pressionadas e soltas num dado intervalo
-function ArrowUp(obj){ obj.directions["up"] = 1; }
-function ArrowDown(obj){ obj.directions["down"] = 1; }
-function ArrowLeft(obj){ obj.directions["left"] = 1; }
-function ArrowRight(obj){ obj.directions["right"] = 1; }
-
-function ArrowUpRelease(obj){ obj.directions["up"] = 0; }
-function ArrowDownRelease(obj){ obj.directions["down"] = 0; }
-function ArrowLeftRelease(obj){ obj.directions["left"] = 0; }
-function ArrowRightRelease(obj){ obj.directions["right"] = 0; }
-
-
-function articulateMove(obj){
-
-    for(let key in obj.directions){ 
-        if(obj.directions[key] == 1){ moves[key](obj) } 
-    }
-}
-
-const moves = {
-    "up": moveUp,
-    "down": moveDown,
-    "left": moveLeft,
-    "right": moveRight,
-    "none" : moveIdle
-}
-
-function moveUp(obj){ obj.y = obj.y - 1; }
-function moveDown(obj){ obj.y = obj.y + 1; }
-function moveLeft(obj){obj.x = obj.x - 1;}
-function moveRight(obj){obj.x = obj.x + 1;}
-function moveIdle(obj){return;}
-
-
-function logicalLoop(objs){
-    for(var i = 0; i < objs.length; i++){
-        articulateMove(objs[i]);
-        // if(objs[i].direction == "ArrowUp" ){
-        //     console.log(objs[i]);
-        //     objs[i].y = objs[i].y - 1;
-        // }
-    }
-}
+//******************* End Animacao Central *******************
 
 </script>
 

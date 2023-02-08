@@ -4,5 +4,11 @@ Linha Atual
     Fazer a movimentacao apenas, melhorar a logica das classes, encapsular e ler sobre padres de design q podem ajudar nisso
 
 
+ - Parei aqui - fazer o press start
+ - logica de colisao
+ - Logica de danos
+ - Animacao de danos
+ - Comando do 2o, ou Ia
+ - Fazer primeiro o encapsulamento e reordenacao do codigo, depois, e ver sobre padroes de design por ultimo
  - A primeira versao nao considera setInterval q talvez seja alternativa melhor
  - Talvez mudar a logica de chamada de funcoes dado q a mesma poderia estar no prorio objeto
