@@ -49,35 +49,47 @@ var possibleMoves = []
 //parei aqui vetor de movimntos
 
 var idleState1 = {
-        x: 50,
-        y: 50,
-        width: 50,
-        height: 50,
-        directions: [["none", "up", "down", "left", "right"],[1, 0, 0, 0, 0]] 
+    x: 50,
+    y: 50,
+    width: 50,
+    height: 50,
+    directions: {
+        "none" : 1, 
+        "up" : 0, 
+        "down" : 0, 
+        "left": 0,
+        "right": 0
+    } 
 }
 
 var idleState2 = {
-        x: 250,
-        y: 50,
-        width: 50,
-        height: 50,
-        directions: [["none", "up", "down", "left", "right"],[1, 0, 0, 0, 0]]
+    x: 250,
+    y: 50,
+    width: 50,
+    height: 50,
+    directions: {
+        "none" : 1, 
+        "up" : 0, 
+        "down" : 0, 
+        "left": 0,
+        "right": 0
+    }
 }
 
 var objs = [idleState1, idleState2]
 
 const activeKeyNotifier = {
-        "ArrowUp"       : ArrowUp,
-        "ArrowDown"     : ArrowDown,
-        "ArrowLeft"     : ArrowLeft,
-        "ArrowRight"    : ArrowRight
+    "ArrowUp"       : ArrowUp,
+    "ArrowDown"     : ArrowDown,
+    "ArrowLeft"     : ArrowLeft,
+    "ArrowRight"    : ArrowRight
 }
 
 const deactiveKeyNotifier = {
-        "ArrowUp"       : ArrowUpRelease,
-        "ArrowDown"     : ArrowDownRelease,
-        "ArrowLeft"     : ArrowLeftRelease,
-        "ArrowRight"    : ArrowRightRelease
+    "ArrowUp"       : ArrowUpRelease,
+    "ArrowDown"     : ArrowDownRelease,
+    "ArrowLeft"     : ArrowLeftRelease,
+    "ArrowRight"    : ArrowRightRelease
 }
 
 document.addEventListener('keydown', observadorTeclasDown, false)
@@ -141,9 +153,9 @@ function ArrowRightRelease(obj){ obj.directions["right"] = 0; }
 
 
 function articulateMove(obj){
-    //moves[obj.direction](obj);
-    for(var i = 1; i < obj.directions.length; i++){
-        moves[obj.directions[i]]
+
+    for(let key in obj.directions){ 
+        if(obj.directions[key] == 1){ moves[key](obj) } 
     }
 }
 
