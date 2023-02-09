@@ -21,8 +21,8 @@ html, body{
     margin-left: auto !important;
     margin-right: auto !important;
     /* width: calc((100vw - (100vw - 100%))*0.9); */
-    height: 350px;
-    width: 350px;
+    height: 500px;
+    width: 500px;
     background-color: lavender;
     border: 1px solid black;    
 }
@@ -48,14 +48,14 @@ var estadoAtual = 0;
 var estados = [[telaInicial], [startAnimation], [startAnimation, animate]];
 var speedIteratorX = 0;
 var speedIteratorY = 0;
-var maxSpeedX = 10;
-var maxSpeedY = 10;
+var maxSpeedX = 2;
+var maxSpeedY = 2;
 
 var idleState1 = {
     x: 50,
     y: 50,
-    width: 50,
-    height: 50,
+    width: 5,
+    height: 5,
     directions: {
         "none" : 1, 
         "up" : 0, 
@@ -157,6 +157,7 @@ function logicalLoop(objs){
     for(var i = 0; i < objs.length; i++) articulateMove(objs[i])
 }
 
+//speed iterator precisa ser melhorado
 function speedIterator(axis, modulo){
     
     if(axis == "x"){
@@ -170,7 +171,6 @@ function speedIterator(axis, modulo){
                 speedIteratorX = speedIteratorX + modulo;
             }
         }
-        
         return speedIteratorX;
     }
 
@@ -185,7 +185,6 @@ function speedIterator(axis, modulo){
                 speedIteratorY = speedIteratorY + modulo;
             }
         }
-        
         return speedIteratorY;
     }
 
@@ -219,8 +218,8 @@ function drawSquare(obj){
 function initCanvas(){
     canvas = document.getElementById('canvas');
     canvasContext = canvas.getContext('2d');
-    canvasWidth = canvas.width = 350;
-    canvasHeight = canvas.height = 350;
+    canvasWidth = canvas.width = 500;
+    canvasHeight = canvas.height = 500;
     telaInicial();
 }
 
