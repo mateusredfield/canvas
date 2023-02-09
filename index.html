@@ -46,6 +46,10 @@ var idleState2;
 var objs = [];
 var estadoAtual = 0;
 var estados = [[telaInicial], [startAnimation], [startAnimation, animate]];
+var speedIteratorX = 0;
+var speedIteratorY = 0;
+var maxSpeedX = 10;
+var maxSpeedY = 10;
 
 var idleState1 = {
     x: 50,
@@ -135,10 +139,10 @@ function ArrowLeftRelease(obj){ obj.directions["left"] = 0; }
 function ArrowRightRelease(obj){ obj.directions["right"] = 0; }
 
 
-function moveUp(obj){ obj.y = obj.y - 2; }
-function moveDown(obj){ obj.y = obj.y + 2; }
-function moveLeft(obj){obj.x = obj.x - 2;}
-function moveRight(obj){obj.x = obj.x + 2;}
+function moveUp(obj){ obj.y = obj.y     +   speedIterator("y", -1);}
+function moveDown(obj){ obj.y = obj.y   +   speedIterator("y", 1);}
+function moveLeft(obj){obj.x = obj.x    +   speedIterator("x", -1);}
+function moveRight(obj){obj.x = obj.x   +   speedIterator("x", 1);}
 function moveIdle(obj){return;}
 
 function articulateMove(obj){
@@ -151,6 +155,41 @@ function articulateMove(obj){
 //Metodo a ser inserido no loop central de animacao geral
 function logicalLoop(objs){
     for(var i = 0; i < objs.length; i++) articulateMove(objs[i])
+}
+
+function speedIterator(axis, modulo){
+    
+    if(axis == "x"){
+        if(Math.sign(speedIteratorX) == Math.sign(modulo)){
+            if(  Math.abs((speedIteratorX + modulo)) < Math.abs(maxSpeedX) ){
+                speedIteratorX = speedIteratorX + modulo;
+            }
+        }else{
+            speedIteratorX = speedIteratorX*(-1);
+            if(  Math.abs((speedIteratorX + modulo)) < Math.abs(maxSpeedX) ){
+                speedIteratorX = speedIteratorX + modulo;
+            }
+        }
+        
+        return speedIteratorX;
+    }
+
+    if(axis == "y"){
+        if(Math.sign(speedIteratorY) == Math.sign(modulo)){
+            if(  Math.abs((speedIteratorY + modulo)) < Math.abs(maxSpeedY) ){
+                speedIteratorY = speedIteratorY + modulo;
+            }
+        }else{
+            speedIteratorY = speedIteratorY*(-1);
+            if(  Math.abs((speedIteratorY + modulo)) < Math.abs(maxSpeedY) ){
+                speedIteratorY = speedIteratorY + modulo;
+            }
+        }
+        
+        return speedIteratorY;
+    }
+
+    return 0;
 }
 
 //********************** End Movimentacao **********************
