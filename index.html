@@ -135,10 +135,10 @@ function ArrowLeftRelease(obj){ obj.directions["left"] = 0; }
 function ArrowRightRelease(obj){ obj.directions["right"] = 0; }
 
 
-function moveUp(obj){ obj.y = obj.y - 1; }
-function moveDown(obj){ obj.y = obj.y + 1; }
-function moveLeft(obj){obj.x = obj.x - 1;}
-function moveRight(obj){obj.x = obj.x + 1;}
+function moveUp(obj){ obj.y = obj.y - 2; }
+function moveDown(obj){ obj.y = obj.y + 2; }
+function moveLeft(obj){obj.x = obj.x - 2;}
+function moveRight(obj){obj.x = obj.x + 2;}
 function moveIdle(obj){return;}
 
 function articulateMove(obj){
@@ -197,10 +197,6 @@ function telaInicial(){
 function startAnimation(){
 
     ++estadoAtual;
-    // canvas = document.getElementById('canvas');
-    // canvasContext = canvas.getContext('2d');
-    // canvasWidth = canvas.width = 350;
-    // canvasHeight = canvas.height = 350;
     animate();
 }
 

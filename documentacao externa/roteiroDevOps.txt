@@ -4,8 +4,12 @@ Linha Atual
     Fazer a movimentacao apenas, melhorar a logica das classes, encapsular e ler sobre padres de design q podem ajudar nisso
 
 
- - Parei aqui - fazer o press start
+ ok - fazer o press start
+ - logica de velocidade
  - logica de colisao
+ - logica de coleta de item
+ - logica de itemizacao
+ - logica de nivel
  - Logica de danos
  - Animacao de danos
  - Comando do 2o, ou Ia
