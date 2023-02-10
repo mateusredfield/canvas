@@ -5,7 +5,7 @@ Linha Atual
 
 
  ok - fazer o press start
- - logica de velocidade
+ ok -  logica de velocidade
  - logica de colisao
  - logica de coleta de item
  - logica de itemizacao
