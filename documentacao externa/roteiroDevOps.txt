@@ -6,6 +6,8 @@ Linha Atual
 
  ok - fazer o press start
  ok -  logica de velocidade
+ - logica de camera
+ - logica de mapa
  - logica de colisao
  - logica de coleta de item
  - logica de itemizacao
