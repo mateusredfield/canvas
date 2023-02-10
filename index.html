@@ -50,6 +50,8 @@ var speedIteratorX = 0;
 var speedIteratorY = 0;
 var maxSpeedX = 2;
 var maxSpeedY = 2;
+var defaultCanvasWidth = 500;
+var defaultCanvasHeight = 500;
 
 var idleState1 = {
     x: 50,
@@ -218,8 +220,8 @@ function drawSquare(obj){
 function initCanvas(){
     canvas = document.getElementById('canvas');
     canvasContext = canvas.getContext('2d');
-    canvasWidth = canvas.width = 500;
-    canvasHeight = canvas.height = 500;
+    canvasWidth = canvas.width = defaultCanvasWidth;
+    canvasHeight = canvas.height = defaultCanvasHeight;
     telaInicial();
 }
 
@@ -257,8 +259,18 @@ function tryFunction(funcao){
     }
 }
 
+function initCss(){
+    //document.getElementById('canvas').style.
+    document.getElementById('canvas').style.width = defaultCanvasWidth;
+    document.getElementById('canvas').style.height = defaultCanvasHeight;
+    //console.log(document.getElementById('canvas').style.width);
+    document.getElementById('areaCanvas').style.width = defaultCanvasWidth + "px";
+    document.getElementById('areaCanvas').style.height = defaultCanvasHeight + "px";
+}
+
 function init(){
     
+    initCss();
     initCanvas();
 }
 
@@ -268,7 +280,7 @@ function init(){
 
 <body>
 
-    <div onclick="tryFunction(startAnimation)" class="areaCanvas">
+    <div onclick="tryFunction(startAnimation)" class="areaCanvas" id="areaCanvas">
         
         <canvas id="canvas">
         </canvas>
