@@ -52,8 +52,16 @@ var maxSpeedX = 2;
 var maxSpeedY = 2;
 var defaultCanvasWidth = 500;
 var defaultCanvasHeight = 500;
+var logicalMap = [];
+var idleState1;
+var idleState2;
+var objetos;
 
-var idleState1 = {
+objs = [idleState1, idleState2];
+objetos = [{x: 250, y:50, width: 50, height: 50}, {x: 450, y:450, width: 20, height: 20}, {x: 150, y:350, width: 20, height: 20}];
+
+
+idleState1 = {
     x: 50,
     y: 50,
     width: 5,
@@ -67,7 +75,7 @@ var idleState1 = {
     } 
 }
 
-var idleState2 = {
+idleState2 = {
     x: 250,
     y: 50,
     width: 50,
@@ -80,8 +88,6 @@ var idleState2 = {
         "right": 0
     }
 }
-
-objs = [idleState1, idleState2];
 
 //************************* Trecho de Movimentacao ***********************
 const activeKeyNotifier = {
@@ -106,6 +112,8 @@ const moves = {
     "right": moveRight,
     "none" : moveIdle
 }
+
+
 
 //obervadores e manipuladores de valores de entrada
 function observadorTeclasDown(e){
@@ -155,7 +163,7 @@ function articulateMove(obj){
 }
 
 //Metodo a ser inserido no loop central de animacao geral
-function logicalLoop(objs){
+function idlesLoop(objs){
     for(var i = 0; i < objs.length; i++) articulateMove(objs[i])
 }
 
@@ -210,12 +218,20 @@ function drawSquare(obj){
 
     canvasContext.fillRect(x, y, width, height);
 }
+
+
+function drawMap(){
+    for(var i = 0; i < objetos.length; i++){
+        drawSquare(objetos[i]);
+    }
+}
 //********************* End Animacao *********************
 
 
 
 //********************* Animacao Central *********************
 //loop animacao - um apenas starta com algumas medidas e alocacaoes e a outra funcao q eh o loop em si
+
 
 function initCanvas(){
     canvas = document.getElementById('canvas');
@@ -237,15 +253,27 @@ function telaInicial(){
 function startAnimation(){
 
     ++estadoAtual;
+
+    initLogicalMap();
+
     animate();
 }
 
 function animate(){
     
     canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
-    logicalLoop(objs);
+    
+    //cuida da parte logica de objetos como idles e npcs
+    idlesLoop(objs);
+    
+    //cuida da logica de scenario
+    refreshLogicalMap();
+
+    //cuida da logica de desenhar o scenario logico
+    drawMap();
+    
     drawSquare(idleState1);
-    drawSquare(idleState2);
+    
     requestAnimationFrame(animate);
 }
 
@@ -268,10 +296,42 @@ function initCss(){
     document.getElementById('areaCanvas').style.height = defaultCanvasHeight + "px";
 }
 
+function insertLogicalSquare(objeto){
+    var y1 = objeto.y;
+    var y2 = objeto.y + objeto.height;
+    var x1 = objeto.x;
+    var x2 = objeto.x + objeto.width;
+    for(var j = y1; j < y2; j++){
+        for(var k = x1; k < x2; k++){
+            logicalMap[j][k] = 1;
+        }
+    }
+}
+
+function initLogicalMap(){
+    
+    for(var i = 0; i < defaultCanvasHeight; i++){
+        logicalMap[i] = [];
+        for(var j = 0; j < defaultCanvasWidth; j++){
+            logicalMap[i][j] = 0;
+        }
+    }
+
+    for(var i = 0; i < objetos.length; i++){
+        insertLogicalSquare(objetos[i]);
+    }
+    //drawMap();
+}
+
 function init(){
     
     initCss();
     initCanvas();
+    //initLogicalMap();
+}
+
+function refreshLogicalMap(){
+    return;
 }
 
 //********************* End Funcoes Geral **********************
