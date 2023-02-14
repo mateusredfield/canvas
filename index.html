@@ -61,11 +61,9 @@ var viewStateMajor;
 var initialX = 250;
 var initialY = 250;
 
-objs = [idleState1, idleState2];
 objetos = [{x: 250, y:50, width: 50, height: 50}, {x: 450, y:450, width: 20, height: 20}, {x: 150, y:350, width: 20, height: 20}];
 mapCoords = [{x: 250, y: 250, width: 0, height: 0}];
 translate = [{x: 0, y: 0}];
-viewStateMajor = [viewState];
 
 idleState1 = {
     x: 50,
@@ -108,6 +106,10 @@ viewState = {
         "right": 0
     }
 }
+
+
+objs = [idleState1, idleState2];
+viewStateMajor = [viewState];
 
 //************************* Trecho de Movimentacao ***********************
 const activeKeyNotifier = {
@@ -162,13 +164,13 @@ function observadorTeclasUp(e){
 function keysManipulator(key){
     console.log(key);
     activeKeyNotifier.hasOwnProperty(key) ? activeKeyNotifier[key](idleState1) : console.log("null") ;
-    activeKeyViewNotifier.hasOwnProperty(key) ? activeKeyViewNotifier[key](viewState) : console.log("null") ;
+    activeKeyViewNotifier.hasOwnProperty(key) ? activeKeyViewNotifier[key](viewStateMajor[0]) : console.log("null") ;
 }
 
 function keysReleaseManipulator(key){
     console.log("Soltou " + key);
     deactiveKeyNotifier.hasOwnProperty(key) ? deactiveKeyNotifier[key](idleState1) : console.log("null") ;
-    deactiveKeyViewNotifier.hasOwnProperty(key) ? deactiveKeyViewNotifier[key](viewState) : console.log("null") ;
+    deactiveKeyViewNotifier.hasOwnProperty(key) ? deactiveKeyViewNotifier[key](viewStateMajor[0]) : console.log("null") ;
 }
 
 //seta direcao e caso sim articula chama funcao de mover/fazer movimento
@@ -257,8 +259,9 @@ function speedIterator(axis, modulo){
 
 function translateObjs(elementos){
     for(var i = 0; i < elementos.length; i++){
-        elementos[i].x = elementos[i].x  -(viewState[0].x - initialX);
-        elementos[i].y = elementos[i].y  -(viewState[0].y - initialY);
+        elementos[i].x = elementos[i].x  -(viewStateMajor[0].x - initialX);
+        elementos[i].y = elementos[i].y  -(viewStateMajor[0].y - initialY);
+        console.log(viewStateMajor[0].y);
     }
 }
 
@@ -327,6 +330,8 @@ function animate(){
     
     //logica de objetos como idles e npcs
     idlesLoop(objs);
+
+    viewLoop(viewStateMajor[0])
 
     //desenho do elementos idles e npcs
     drawSquare(idleState1);
