@@ -56,10 +56,16 @@ var logicalMap = [];
 var idleState1;
 var idleState2;
 var objetos;
+var viewState;
+var viewStateMajor;
+var initialX = 250;
+var initialY = 250;
 
 objs = [idleState1, idleState2];
 objetos = [{x: 250, y:50, width: 50, height: 50}, {x: 450, y:450, width: 20, height: 20}, {x: 150, y:350, width: 20, height: 20}];
-
+mapCoords = [{x: 250, y: 250, width: 0, height: 0}];
+translate = [{x: 0, y: 0}];
+viewStateMajor = [viewState];
 
 idleState1 = {
     x: 50,
@@ -89,19 +95,41 @@ idleState2 = {
     }
 }
 
+viewState = {
+    x: initialX,
+    y: initialY,
+    width: 0,
+    height: 0,
+    directions: {
+        "none" : 1, 
+        "up" : 0, 
+        "down" : 0, 
+        "left": 0,
+        "right": 0
+    }
+}
+
 //************************* Trecho de Movimentacao ***********************
 const activeKeyNotifier = {
     "ArrowUp"       : ArrowUp,
     "ArrowDown"     : ArrowDown,
     "ArrowLeft"     : ArrowLeft,
-    "ArrowRight"    : ArrowRight
+    "ArrowRight"    : ArrowRight,
 }
 
 const deactiveKeyNotifier = {
     "ArrowUp"       : ArrowUpRelease,
     "ArrowDown"     : ArrowDownRelease,
     "ArrowLeft"     : ArrowLeftRelease,
-    "ArrowRight"    : ArrowRightRelease
+    "ArrowRight"    : ArrowRightRelease,
+}
+
+const activeKeyViewNotifier = {
+    "i"             : iKeyPress
+}
+
+const deactiveKeyViewNotifier = {
+    "i"             : iKeyRelease
 }
 
 //lista de movimentos possiveis
@@ -113,6 +141,13 @@ const moves = {
     "none" : moveIdle
 }
 
+const viewMoves = {
+    "up": moveUp,
+    "down": moveDown,
+    "left": moveLeft,
+    "right": moveRight,
+    "none" : moveIdle
+}
 
 
 //obervadores e manipuladores de valores de entrada
@@ -127,11 +162,13 @@ function observadorTeclasUp(e){
 function keysManipulator(key){
     console.log(key);
     activeKeyNotifier.hasOwnProperty(key) ? activeKeyNotifier[key](idleState1) : console.log("null") ;
+    activeKeyViewNotifier.hasOwnProperty(key) ? activeKeyViewNotifier[key](viewState) : console.log("null") ;
 }
 
 function keysReleaseManipulator(key){
     console.log("Soltou " + key);
     deactiveKeyNotifier.hasOwnProperty(key) ? deactiveKeyNotifier[key](idleState1) : console.log("null") ;
+    deactiveKeyViewNotifier.hasOwnProperty(key) ? deactiveKeyViewNotifier[key](viewState) : console.log("null") ;
 }
 
 //seta direcao e caso sim articula chama funcao de mover/fazer movimento
@@ -142,18 +179,26 @@ function ArrowUp(obj){ obj.directions["up"] = 1; }
 function ArrowDown(obj){ obj.directions["down"] = 1; }
 function ArrowLeft(obj){ obj.directions["left"] = 1; }
 function ArrowRight(obj){ obj.directions["right"] = 1; }
+function iKeyPress(obj){ obj.directions["up"] = 1; }
 
 function ArrowUpRelease(obj){ obj.directions["up"] = 0; }
 function ArrowDownRelease(obj){ obj.directions["down"] = 0; }
 function ArrowLeftRelease(obj){ obj.directions["left"] = 0; }
 function ArrowRightRelease(obj){ obj.directions["right"] = 0; }
-
+function iKeyRelease(obj){ obj.directions["up"] = 0; }
 
 function moveUp(obj){ obj.y = obj.y     +   speedIterator("y", -1);}
 function moveDown(obj){ obj.y = obj.y   +   speedIterator("y", 1);}
 function moveLeft(obj){obj.x = obj.x    +   speedIterator("x", -1);}
 function moveRight(obj){obj.x = obj.x   +   speedIterator("x", 1);}
 function moveIdle(obj){return;}
+
+//deletar
+function viewMoveUp(obj){ obj.y = obj.y     +   speedIterator("y", -1);}
+function viewMoveDown(obj){ obj.y = obj.y   +   speedIterator("y", 1);}
+function viewMoveLeft(obj){obj.x = obj.x    +   speedIterator("x", -1);}
+function viewNoveRight(obj){obj.x = obj.x   +   speedIterator("x", 1);}
+function viewMoveIdle(obj){return;}
 
 function articulateMove(obj){
 
@@ -165,6 +210,11 @@ function articulateMove(obj){
 //Metodo a ser inserido no loop central de animacao geral
 function idlesLoop(objs){
     for(var i = 0; i < objs.length; i++) articulateMove(objs[i])
+}
+
+//Metodo a ser inserido no loop central de animacao geral
+function viewLoop(obj){
+    articulateMove(obj)
 }
 
 //speed iterator precisa ser melhorado
@@ -203,8 +253,16 @@ function speedIterator(axis, modulo){
 
 //********************** End Movimentacao **********************
 
+//************************ Vizualizacao ************************
 
+function translateObjs(elementos){
+    for(var i = 0; i < elementos.length; i++){
+        elementos[i].x = elementos[i].x  -(viewState[0].x - initialX);
+        elementos[i].y = elementos[i].y  -(viewState[0].y - initialY);
+    }
+}
 
+//**************************************************************
 
 
 
@@ -221,6 +279,10 @@ function drawSquare(obj){
 
 
 function drawMap(){
+    
+    translateObjs(objs);
+    translateObjs(objetos);
+
     for(var i = 0; i < objetos.length; i++){
         drawSquare(objetos[i]);
     }
@@ -263,16 +325,17 @@ function animate(){
     
     canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
     
-    //cuida da parte logica de objetos como idles e npcs
+    //logica de objetos como idles e npcs
     idlesLoop(objs);
-    
-    //cuida da logica de scenario
-    refreshLogicalMap();
 
-    //cuida da logica de desenhar o scenario logico
-    drawMap();
-    
+    //desenho do elementos idles e npcs
     drawSquare(idleState1);
+    
+    //calcula logica de scenario
+    //refreshLogicalMap();
+
+    //desenhar o scenario logico
+    drawMap();
     
     requestAnimationFrame(animate);
 }
