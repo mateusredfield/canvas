@@ -61,10 +61,6 @@ var viewStateMajor;
 var initialX = 250;
 var initialY = 250;
 
-objetos = [{x: 250, y:50, width: 50, height: 50}, {x: 450, y:450, width: 20, height: 20}, {x: 150, y:350, width: 20, height: 20}];
-mapCoords = [{x: 250, y: 250, width: 0, height: 0}];
-translate = [{x: 0, y: 0}];
-
 idleState1 = {
     x: 50,
     y: 50,
@@ -110,6 +106,9 @@ viewState = {
 
 objs = [idleState1, idleState2];
 viewStateMajor = [viewState];
+objetos = [{x: 250, y:50, width: 50, height: 50}, {x: 450, y:450, width: 20, height: 20}, {x: 150, y:350, width: 20, height: 20}];
+mapCoords = [{x: 250, y: 250, width: 0, height: 0}];
+translate = [{x: 0, y: 0}];
 
 //************************* Trecho de Movimentacao ***********************
 const activeKeyNotifier = {
@@ -127,11 +126,17 @@ const deactiveKeyNotifier = {
 }
 
 const activeKeyViewNotifier = {
-    "i"             : iKeyPress
+    "i"             : iKeyPress,
+    "k"             : kKeyPress,
+    "j"             : jKeyPress,
+    "l"             : lKeyPress
 }
 
 const deactiveKeyViewNotifier = {
-    "i"             : iKeyRelease
+    "i"             : iKeyRelease,
+    "k"             : kKeyRelease,
+    "j"             : jKeyRelease,
+    "l"             : lKeyRelease
 }
 
 //lista de movimentos possiveis
@@ -144,11 +149,11 @@ const moves = {
 }
 
 const viewMoves = {
-    "up": moveUp,
-    "down": moveDown,
-    "left": moveLeft,
-    "right": moveRight,
-    "none" : moveIdle
+    "up": viewMoveUp,
+    "down": viewMoveDown,
+    "left": viewMoveLeft,
+    "right": viewMoveRight,
+    "none" : viewMoveIdle
 }
 
 
@@ -182,12 +187,18 @@ function ArrowDown(obj){ obj.directions["down"] = 1; }
 function ArrowLeft(obj){ obj.directions["left"] = 1; }
 function ArrowRight(obj){ obj.directions["right"] = 1; }
 function iKeyPress(obj){ obj.directions["up"] = 1; }
+function kKeyPress(obj){ obj.directions["down"] = 1; }
+function jKeyPress(obj){ obj.directions["left"] = 1; }
+function lKeyPress(obj){ obj.directions["right"] = 1; }
 
 function ArrowUpRelease(obj){ obj.directions["up"] = 0; }
 function ArrowDownRelease(obj){ obj.directions["down"] = 0; }
 function ArrowLeftRelease(obj){ obj.directions["left"] = 0; }
 function ArrowRightRelease(obj){ obj.directions["right"] = 0; }
 function iKeyRelease(obj){ obj.directions["up"] = 0; }
+function kKeyRelease(obj){ obj.directions["down"] = 0; }
+function jKeyRelease(obj){ obj.directions["left"] = 0; }
+function lKeyRelease(obj){ obj.directions["right"] = 0; }
 
 function moveUp(obj){ obj.y = obj.y     +   speedIterator("y", -1);}
 function moveDown(obj){ obj.y = obj.y   +   speedIterator("y", 1);}
@@ -195,14 +206,13 @@ function moveLeft(obj){obj.x = obj.x    +   speedIterator("x", -1);}
 function moveRight(obj){obj.x = obj.x   +   speedIterator("x", 1);}
 function moveIdle(obj){return;}
 
-//deletar
-function viewMoveUp(obj){ obj.y = obj.y     +   speedIterator("y", -1);}
-function viewMoveDown(obj){ obj.y = obj.y   +   speedIterator("y", 1);}
-function viewMoveLeft(obj){obj.x = obj.x    +   speedIterator("x", -1);}
-function viewNoveRight(obj){obj.x = obj.x   +   speedIterator("x", 1);}
+function viewMoveUp(obj){       translates( 0, 1 ); }
+function viewMoveDown(obj){     translates( 0, -1); }
+function viewMoveLeft(obj){     translates( 1, 0 ); }
+function viewMoveRight(obj){    translates( -1, 0); }
 function viewMoveIdle(obj){return;}
 
-function articulateMove(obj){
+function articulateMove(obj, moves){
 
     for(let key in obj.directions){ 
         if(obj.directions[key] == 1){ moves[key](obj) } 
@@ -211,12 +221,12 @@ function articulateMove(obj){
 
 //Metodo a ser inserido no loop central de animacao geral
 function idlesLoop(objs){
-    for(var i = 0; i < objs.length; i++) articulateMove(objs[i])
+    for(var i = 0; i < objs.length; i++) articulateMove(objs[i], moves)
 }
 
 //Metodo a ser inserido no loop central de animacao geral
 function viewLoop(obj){
-    articulateMove(obj)
+    articulateMove(obj, viewMoves)
 }
 
 //speed iterator precisa ser melhorado
@@ -257,14 +267,34 @@ function speedIterator(axis, modulo){
 
 //************************ Vizualizacao ************************
 
-function translateObjs(elementos){
+function translateObjsNull(elementos){
     for(var i = 0; i < elementos.length; i++){
         elementos[i].x = elementos[i].x  -(viewStateMajor[0].x - initialX);
         elementos[i].y = elementos[i].y  -(viewStateMajor[0].y - initialY);
-        console.log(viewStateMajor[0].y);
+        console.log(elementos[i].y + " " + viewStateMajor[0].y);
     }
 }
 
+function translates(x, y){
+    
+    for(var i = 0; i < objs.length; i++){
+        translate2dX(objs[i], x);
+        translate2dY(objs[i], y);
+    }
+
+    for(var i = 0; i < objetos.length; i++){
+        translate2dX(objetos[i], x);
+        translate2dY(objetos[i], y);
+    }
+}
+
+function translate2dX(elemento, dist){
+    elemento.x = elemento.x  + dist;
+} 
+
+function translate2dY(elemento, dist){
+    elemento.y = elemento.y  + dist;
+}
 //**************************************************************
 
 
@@ -283,8 +313,8 @@ function drawSquare(obj){
 
 function drawMap(){
     
-    translateObjs(objs);
-    translateObjs(objetos);
+    // translateObjs(objs);
+    // translateObjs(objetos);
 
     for(var i = 0; i < objetos.length; i++){
         drawSquare(objetos[i]);
