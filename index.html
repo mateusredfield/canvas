@@ -50,8 +50,18 @@ var speedIteratorX = 0;
 var speedIteratorY = 0;
 var maxSpeedX = 2;
 var maxSpeedY = 2;
+var defaultCanvasWidth = 500;
+var defaultCanvasHeight = 500;
+var logicalMap = [];
+var idleState1;
+var idleState2;
+var objetos;
+var viewState;
+var viewStateMajor;
+var initialX = 250;
+var initialY = 250;
 
-var idleState1 = {
+idleState1 = {
     x: 50,
     y: 50,
     width: 5,
@@ -65,7 +75,7 @@ var idleState1 = {
     } 
 }
 
-var idleState2 = {
+idleState2 = {
     x: 250,
     y: 50,
     width: 50,
@@ -79,7 +89,26 @@ var idleState2 = {
     }
 }
 
+viewState = {
+    x: initialX,
+    y: initialY,
+    width: 0,
+    height: 0,
+    directions: {
+        "none" : 1, 
+        "up" : 0, 
+        "down" : 0, 
+        "left": 0,
+        "right": 0
+    }
+}
+
+
 objs = [idleState1, idleState2];
+viewStateMajor = [viewState];
+objetos = [{x: 250, y:50, width: 50, height: 50}, {x: 450, y:450, width: 20, height: 20}, {x: 150, y:350, width: 20, height: 20}];
+mapCoords = [{x: 250, y: 250, width: 0, height: 0}];
+translate = [{x: 0, y: 0}];
 
 //************************* Trecho de Movimentacao ***********************
 const activeKeyNotifier = {
@@ -96,6 +125,34 @@ const deactiveKeyNotifier = {
     "ArrowRight"    : ArrowRightRelease
 }
 
+const activeKeyViewNotifier = {
+    "i"             : iKeyPress,
+    "k"             : kKeyPress,
+    "j"             : jKeyPress,
+    "l"             : lKeyPress
+}
+
+const deactiveKeyViewNotifier = {
+    "i"             : iKeyRelease,
+    "k"             : kKeyRelease,
+    "j"             : jKeyRelease,
+    "l"             : lKeyRelease
+}
+
+const activeKeyCameraHoldNotifier = {
+    "ç"             : ["ArrowUp", "i"],
+    ";"             : ["ArrowDown", "k"],
+    "."             : ["ArrowLeft", "j"],
+    "/"             : ["ArrowRight", "l"]
+}
+
+const deactiveKeyCameraHoldNotifier = {
+    "ç"             : ["ArrowUp", "i"],
+    ";"             : ["ArrowDown", "k"],
+    "."             : ["ArrowLeft", "j"],
+    "/"             : ["ArrowRight", "l"]
+}
+
 //lista de movimentos possiveis
 const moves = {
     "up": moveUp,
@@ -105,23 +162,54 @@ const moves = {
     "none" : moveIdle
 }
 
+const viewMoves = {
+    "up": viewMoveUp,
+    "down": viewMoveDown,
+    "left": viewMoveLeft,
+    "right": viewMoveRight,
+    "none" : viewMoveIdle
+}
+
+
 //obervadores e manipuladores de valores de entrada
 function observadorTeclasDown(e){
-    keysManipulator(e.key);
+    keysManipulatorNormal(e.key);
+    //keysManipulatorCameraHold(e.key);
 }
 
 function observadorTeclasUp(e){
-    keysReleaseManipulator(e.key);
+    keysReleaseManipulatorNormal(e.key);
+    //keysReleaseManipulatorCameraHold(e.key);
 }
 
-function keysManipulator(key){
+function keysManipulatorNormal(key){
     console.log(key);
-    activeKeyNotifier.hasOwnProperty(key) ? activeKeyNotifier[key](idleState1) : console.log("null") ;
+    if( activeKeyCameraHoldNotifier.hasOwnProperty(key) ){
+        var idleKey = activeKeyCameraHoldNotifier[key][0];
+        var viewKey = activeKeyCameraHoldNotifier[key][1];
+        activeKeyNotifier[idleKey](idleState1);
+        activeKeyViewNotifier[viewKey](viewStateMajor[0]);
+        //activeKeyNotifier.hasOwnProperty(idleKey) ? activeKeyNotifier[idleKey](idleState1) : console.log("null") ;
+        //activeKeyNotifier.hasOwnProperty(activeKeyCameraHoldNotifier[key][1]) ? activeKeyNotifier[key](idleState1) : console.log("null") ;
+    }else{
+        activeKeyNotifier.hasOwnProperty(key) ? activeKeyNotifier[key](idleState1) : console.log("null") ;
+        activeKeyViewNotifier.hasOwnProperty(key) ? activeKeyViewNotifier[key](viewStateMajor[0]) : console.log("null") ;
+    }
 }
 
-function keysReleaseManipulator(key){
+function keysReleaseManipulatorNormal(key){
     console.log("Soltou " + key);
-    deactiveKeyNotifier.hasOwnProperty(key) ? deactiveKeyNotifier[key](idleState1) : console.log("null") ;
+    if( deactiveKeyCameraHoldNotifier.hasOwnProperty(key) ){
+        var idleKey = deactiveKeyCameraHoldNotifier[key][0];
+        var viewKey = deactiveKeyCameraHoldNotifier[key][1];
+        deactiveKeyNotifier[idleKey](idleState1);
+        deactiveKeyViewNotifier[viewKey](viewStateMajor[0]);
+        //activeKeyNotifier.hasOwnProperty(idleKey) ? activeKeyNotifier[idleKey](idleState1) : console.log("null") ;
+        //activeKeyNotifier.hasOwnProperty(activeKeyCameraHoldNotifier[key][1]) ? activeKeyNotifier[key](idleState1) : console.log("null") ;
+    }else{
+        deactiveKeyNotifier.hasOwnProperty(key) ? deactiveKeyNotifier[key](idleState1) : console.log("null") ;
+        deactiveKeyViewNotifier.hasOwnProperty(key) ? deactiveKeyViewNotifier[key](viewStateMajor[0]) : console.log("null") ;
+    }
 }
 
 //seta direcao e caso sim articula chama funcao de mover/fazer movimento
@@ -132,12 +220,19 @@ function ArrowUp(obj){ obj.directions["up"] = 1; }
 function ArrowDown(obj){ obj.directions["down"] = 1; }
 function ArrowLeft(obj){ obj.directions["left"] = 1; }
 function ArrowRight(obj){ obj.directions["right"] = 1; }
+function iKeyPress(obj){ obj.directions["up"] = 1; }
+function kKeyPress(obj){ obj.directions["down"] = 1; }
+function jKeyPress(obj){ obj.directions["left"] = 1; }
+function lKeyPress(obj){ obj.directions["right"] = 1; }
 
 function ArrowUpRelease(obj){ obj.directions["up"] = 0; }
 function ArrowDownRelease(obj){ obj.directions["down"] = 0; }
 function ArrowLeftRelease(obj){ obj.directions["left"] = 0; }
 function ArrowRightRelease(obj){ obj.directions["right"] = 0; }
-
+function iKeyRelease(obj){ obj.directions["up"] = 0; }
+function kKeyRelease(obj){ obj.directions["down"] = 0; }
+function jKeyRelease(obj){ obj.directions["left"] = 0; }
+function lKeyRelease(obj){ obj.directions["right"] = 0; }
 
 function moveUp(obj){ obj.y = obj.y     +   speedIterator("y", -1);}
 function moveDown(obj){ obj.y = obj.y   +   speedIterator("y", 1);}
@@ -145,7 +240,13 @@ function moveLeft(obj){obj.x = obj.x    +   speedIterator("x", -1);}
 function moveRight(obj){obj.x = obj.x   +   speedIterator("x", 1);}
 function moveIdle(obj){return;}
 
-function articulateMove(obj){
+function viewMoveUp(obj){       translates( 0, 1 ); }
+function viewMoveDown(obj){     translates( 0, -1); }
+function viewMoveLeft(obj){     translates( 1, 0 ); }
+function viewMoveRight(obj){    translates( -1, 0); }
+function viewMoveIdle(obj){return;}
+
+function articulateMove(obj, moves){
 
     for(let key in obj.directions){ 
         if(obj.directions[key] == 1){ moves[key](obj) } 
@@ -153,8 +254,13 @@ function articulateMove(obj){
 }
 
 //Metodo a ser inserido no loop central de animacao geral
-function logicalLoop(objs){
-    for(var i = 0; i < objs.length; i++) articulateMove(objs[i])
+function idlesLoop(objs){
+    for(var i = 0; i < objs.length; i++) articulateMove(objs[i], moves)
+}
+
+//Metodo a ser inserido no loop central de animacao geral
+function viewLoop(obj){
+    articulateMove(obj, viewMoves)
 }
 
 //speed iterator precisa ser melhorado
@@ -193,8 +299,37 @@ function speedIterator(axis, modulo){
 
 //********************** End Movimentacao **********************
 
+//************************ Vizualizacao ************************
 
+function translateObjsNull(elementos){
+    for(var i = 0; i < elementos.length; i++){
+        elementos[i].x = elementos[i].x  -(viewStateMajor[0].x - initialX);
+        elementos[i].y = elementos[i].y  -(viewStateMajor[0].y - initialY);
+        console.log(elementos[i].y + " " + viewStateMajor[0].y);
+    }
+}
 
+function translates(x, y){
+    
+    for(var i = 0; i < objs.length; i++){
+        translate2dX(objs[i], x);
+        translate2dY(objs[i], y);
+    }
+
+    for(var i = 0; i < objetos.length; i++){
+        translate2dX(objetos[i], x);
+        translate2dY(objetos[i], y);
+    }
+}
+
+function translate2dX(elemento, dist){
+    elemento.x = elemento.x  + dist;
+} 
+
+function translate2dY(elemento, dist){
+    elemento.y = elemento.y  + dist;
+}
+//**************************************************************
 
 
 
@@ -208,6 +343,17 @@ function drawSquare(obj){
 
     canvasContext.fillRect(x, y, width, height);
 }
+
+
+function drawMap(){
+    
+    // translateObjs(objs);
+    // translateObjs(objetos);
+
+    for(var i = 0; i < objetos.length; i++){
+        drawSquare(objetos[i]);
+    }
+}
 //********************* End Animacao *********************
 
 
@@ -215,11 +361,12 @@ function drawSquare(obj){
 //********************* Animacao Central *********************
 //loop animacao - um apenas starta com algumas medidas e alocacaoes e a outra funcao q eh o loop em si
 
+
 function initCanvas(){
     canvas = document.getElementById('canvas');
     canvasContext = canvas.getContext('2d');
-    canvasWidth = canvas.width = 500;
-    canvasHeight = canvas.height = 500;
+    canvasWidth = canvas.width = defaultCanvasWidth;
+    canvasHeight = canvas.height = defaultCanvasHeight;
     telaInicial();
 }
 
@@ -235,15 +382,30 @@ function telaInicial(){
 function startAnimation(){
 
     ++estadoAtual;
+
+    initLogicalMap();
+
     animate();
 }
 
 function animate(){
     
     canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
-    logicalLoop(objs);
+    
+    //logica de objetos como idles e npcs
+    idlesLoop(objs);
+
+    viewLoop(viewStateMajor[0])
+
+    //desenho do elementos idles e npcs
     drawSquare(idleState1);
-    drawSquare(idleState2);
+    
+    //calcula logica de scenario
+    //refreshLogicalMap();
+
+    //desenhar o scenario logico
+    drawMap();
+    
     requestAnimationFrame(animate);
 }
 
@@ -257,9 +419,51 @@ function tryFunction(funcao){
     }
 }
 
+function initCss(){
+    //document.getElementById('canvas').style.
+    document.getElementById('canvas').style.width = defaultCanvasWidth;
+    document.getElementById('canvas').style.height = defaultCanvasHeight;
+    //console.log(document.getElementById('canvas').style.width);
+    document.getElementById('areaCanvas').style.width = defaultCanvasWidth + "px";
+    document.getElementById('areaCanvas').style.height = defaultCanvasHeight + "px";
+}
+
+function insertLogicalSquare(objeto){
+    var y1 = objeto.y;
+    var y2 = objeto.y + objeto.height;
+    var x1 = objeto.x;
+    var x2 = objeto.x + objeto.width;
+    for(var j = y1; j < y2; j++){
+        for(var k = x1; k < x2; k++){
+            logicalMap[j][k] = 1;
+        }
+    }
+}
+
+function initLogicalMap(){
+    
+    for(var i = 0; i < defaultCanvasHeight; i++){
+        logicalMap[i] = [];
+        for(var j = 0; j < defaultCanvasWidth; j++){
+            logicalMap[i][j] = 0;
+        }
+    }
+
+    for(var i = 0; i < objetos.length; i++){
+        insertLogicalSquare(objetos[i]);
+    }
+    //drawMap();
+}
+
 function init(){
     
+    initCss();
     initCanvas();
+    //initLogicalMap();
+}
+
+function refreshLogicalMap(){
+    return;
 }
 
 //********************* End Funcoes Geral **********************
@@ -268,7 +472,7 @@ function init(){
 
 <body>
 
-    <div onclick="tryFunction(startAnimation)" class="areaCanvas">
+    <div onclick="tryFunction(startAnimation)" class="areaCanvas" id="areaCanvas">
         
         <canvas id="canvas">
         </canvas>
