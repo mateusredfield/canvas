@@ -115,14 +115,14 @@ const activeKeyNotifier = {
     "ArrowUp"       : ArrowUp,
     "ArrowDown"     : ArrowDown,
     "ArrowLeft"     : ArrowLeft,
-    "ArrowRight"    : ArrowRight,
+    "ArrowRight"    : ArrowRight
 }
 
 const deactiveKeyNotifier = {
     "ArrowUp"       : ArrowUpRelease,
     "ArrowDown"     : ArrowDownRelease,
     "ArrowLeft"     : ArrowLeftRelease,
-    "ArrowRight"    : ArrowRightRelease,
+    "ArrowRight"    : ArrowRightRelease
 }
 
 const activeKeyViewNotifier = {
@@ -137,6 +137,20 @@ const deactiveKeyViewNotifier = {
     "k"             : kKeyRelease,
     "j"             : jKeyRelease,
     "l"             : lKeyRelease
+}
+
+const activeKeyCameraHoldNotifier = {
+    "ç"             : ["ArrowUp", "i"],
+    ";"             : ["ArrowDown", "k"],
+    "."             : ["ArrowLeft", "j"],
+    "/"             : ["ArrowRight", "l"]
+}
+
+const deactiveKeyCameraHoldNotifier = {
+    "ç"             : ["ArrowUp", "i"],
+    ";"             : ["ArrowDown", "k"],
+    "."             : ["ArrowLeft", "j"],
+    "/"             : ["ArrowRight", "l"]
 }
 
 //lista de movimentos possiveis
@@ -159,23 +173,43 @@ const viewMoves = {
 
 //obervadores e manipuladores de valores de entrada
 function observadorTeclasDown(e){
-    keysManipulator(e.key);
+    keysManipulatorNormal(e.key);
+    //keysManipulatorCameraHold(e.key);
 }
 
 function observadorTeclasUp(e){
-    keysReleaseManipulator(e.key);
+    keysReleaseManipulatorNormal(e.key);
+    //keysReleaseManipulatorCameraHold(e.key);
 }
 
-function keysManipulator(key){
+function keysManipulatorNormal(key){
     console.log(key);
-    activeKeyNotifier.hasOwnProperty(key) ? activeKeyNotifier[key](idleState1) : console.log("null") ;
-    activeKeyViewNotifier.hasOwnProperty(key) ? activeKeyViewNotifier[key](viewStateMajor[0]) : console.log("null") ;
+    if( activeKeyCameraHoldNotifier.hasOwnProperty(key) ){
+        var idleKey = activeKeyCameraHoldNotifier[key][0];
+        var viewKey = activeKeyCameraHoldNotifier[key][1];
+        activeKeyNotifier[idleKey](idleState1);
+        activeKeyViewNotifier[viewKey](viewStateMajor[0]);
+        //activeKeyNotifier.hasOwnProperty(idleKey) ? activeKeyNotifier[idleKey](idleState1) : console.log("null") ;
+        //activeKeyNotifier.hasOwnProperty(activeKeyCameraHoldNotifier[key][1]) ? activeKeyNotifier[key](idleState1) : console.log("null") ;
+    }else{
+        activeKeyNotifier.hasOwnProperty(key) ? activeKeyNotifier[key](idleState1) : console.log("null") ;
+        activeKeyViewNotifier.hasOwnProperty(key) ? activeKeyViewNotifier[key](viewStateMajor[0]) : console.log("null") ;
+    }
 }
 
-function keysReleaseManipulator(key){
+function keysReleaseManipulatorNormal(key){
     console.log("Soltou " + key);
-    deactiveKeyNotifier.hasOwnProperty(key) ? deactiveKeyNotifier[key](idleState1) : console.log("null") ;
-    deactiveKeyViewNotifier.hasOwnProperty(key) ? deactiveKeyViewNotifier[key](viewStateMajor[0]) : console.log("null") ;
+    if( deactiveKeyCameraHoldNotifier.hasOwnProperty(key) ){
+        var idleKey = deactiveKeyCameraHoldNotifier[key][0];
+        var viewKey = deactiveKeyCameraHoldNotifier[key][1];
+        deactiveKeyNotifier[idleKey](idleState1);
+        deactiveKeyViewNotifier[viewKey](viewStateMajor[0]);
+        //activeKeyNotifier.hasOwnProperty(idleKey) ? activeKeyNotifier[idleKey](idleState1) : console.log("null") ;
+        //activeKeyNotifier.hasOwnProperty(activeKeyCameraHoldNotifier[key][1]) ? activeKeyNotifier[key](idleState1) : console.log("null") ;
+    }else{
+        deactiveKeyNotifier.hasOwnProperty(key) ? deactiveKeyNotifier[key](idleState1) : console.log("null") ;
+        deactiveKeyViewNotifier.hasOwnProperty(key) ? deactiveKeyViewNotifier[key](viewStateMajor[0]) : console.log("null") ;
+    }
 }
 
 //seta direcao e caso sim articula chama funcao de mover/fazer movimento
