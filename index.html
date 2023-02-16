@@ -31,6 +31,11 @@ html, body{
 
 <script>
 
+//documentacao interna
+//cada vez q adiciona uma tecla precisa fazer um caminho mto burocratico
+
+
+
 document.addEventListener('keydown', observadorTeclasDown, false)
 document.addEventListener('keyup', observadorTeclasUp, false)
 window.addEventListener('load', init, false);
@@ -60,6 +65,7 @@ var viewState;
 var viewStateMajor;
 var initialX = 250;
 var initialY = 250;
+var cantMove = 1;
 
 idleState1 = {
     x: 50,
@@ -140,18 +146,20 @@ const deactiveKeyViewNotifier = {
 }
 
 const activeKeyCameraHoldNotifier = {
-    "ç"             : ["ArrowUp", "i"],
-    ";"             : ["ArrowDown", "k"],
-    "."             : ["ArrowLeft", "j"],
-    "/"             : ["ArrowRight", "l"]
+    "ç"             : ["ArrowUp", "i", cedillaKeyPress],
+    ";"             : ["ArrowDown", "k", semiCollonKeyPress],
+    "."             : ["ArrowLeft", "j", dotKeyPress],
+    "/"             : ["ArrowRight", "l", barKeyPress]
 }
 
 const deactiveKeyCameraHoldNotifier = {
-    "ç"             : ["ArrowUp", "i"],
-    ";"             : ["ArrowDown", "k"],
-    "."             : ["ArrowLeft", "j"],
-    "/"             : ["ArrowRight", "l"]
+    "ç"             : ["ArrowUp", "i", cedillaKeyRelease],
+    ";"             : ["ArrowDown", "k", semiCollonKeyRelease],
+    "."             : ["ArrowLeft", "j", dotKeyRelease],
+    "/"             : ["ArrowRight", "l", barKeyRelease]
 }
+
+
 
 //lista de movimentos possiveis
 const moves = {
@@ -168,6 +176,13 @@ const viewMoves = {
     "left": viewMoveLeft,
     "right": viewMoveRight,
     "none" : viewMoveIdle
+}
+
+const lockedViewIdleMoves = {
+    "up" : lockedViewIdleTryMoveUp,
+    "down" : lockedViewIdleTryMoveDown,
+    "left" : lockedViewIdleTryMoveLeft,
+    "right" : lockedViewIdleTryMoveRight
 }
 
 
@@ -224,6 +239,10 @@ function iKeyPress(obj){ obj.directions["up"] = 1; }
 function kKeyPress(obj){ obj.directions["down"] = 1; }
 function jKeyPress(obj){ obj.directions["left"] = 1; }
 function lKeyPress(obj){ obj.directions["right"] = 1; }
+function cedillaKeyPress(obj){ obj.directions["up"] = 1;}
+function semiCollonKeyPress(obj){obj.directions["down"] = 1;}
+function dotKeyPress(obj){obj.directions["left"] = 1;}
+function barKeyPress(obj){obj.directions["eight"] = 1;}
 
 function ArrowUpRelease(obj){ obj.directions["up"] = 0; }
 function ArrowDownRelease(obj){ obj.directions["down"] = 0; }
@@ -233,18 +252,80 @@ function iKeyRelease(obj){ obj.directions["up"] = 0; }
 function kKeyRelease(obj){ obj.directions["down"] = 0; }
 function jKeyRelease(obj){ obj.directions["left"] = 0; }
 function lKeyRelease(obj){ obj.directions["right"] = 0; }
+function cedillaKeyRelease(obj){ obj.directions["up"] = 0;}
+function semiCollonKeyRelease(obj){obj.directions["down"] = 0;}
+function dotKeyRelease(obj){obj.directions["left"] = 0;}
+function barKeyRelease(obj){obj.directions["eight"] = 0;}
 
-function moveUp(obj){ obj.y = obj.y     +   speedIterator("y", -1);}
-function moveDown(obj){ obj.y = obj.y   +   speedIterator("y", 1);}
-function moveLeft(obj){obj.x = obj.x    +   speedIterator("x", -1);}
-function moveRight(obj){obj.x = obj.x   +   speedIterator("x", 1);}
-function moveIdle(obj){return;}
+function moveUp(obj){       return iterateWithCollideY( obj, -1);  }
+function moveDown(obj){     return iterateWithCollideY( obj, 1);   }
+function moveLeft(obj){     return iterateWithCollideX( obj, -1);  }
+function moveRight(obj){    return iterateWithCollideX( obj, 1);   }
+function moveIdle(obj){     return false;}
 
 function viewMoveUp(obj){       translates( 0, 1 ); }
 function viewMoveDown(obj){     translates( 0, -1); }
 function viewMoveLeft(obj){     translates( 1, 0 ); }
 function viewMoveRight(obj){    translates( -1, 0); }
-function viewMoveIdle(obj){return;}
+function viewMoveIdle(obj){     return;}
+
+function lockedViewIdleTryMoveUp(obj){      }
+function lockedViewIdleTryMoveDown(obj){}
+function lockedViewIdleTryMoveLeft(obj){}
+function lockedViewIdleTryMoveRight(obj){}
+
+function iterateWithCollideY(obj, value){
+    var incremento = speedIterator("y", value);
+    if( !checkCollide(obj, {x:obj.x, y: (obj.y + incremento)}) ){
+        obj.y = obj.y + incremento;
+        return true;
+    }
+    return false;
+}
+
+function iterateWithCollideX(obj, value){
+    var incremento = speedIterator("x", value);
+    if( !checkCollide(obj, {x:obj.x, y: (obj.x + incremento)}) ){
+        obj.x = obj.x + incremento;
+        return true;
+    }
+    return false;
+}
+
+function checkCollide(obj, coord){
+    var previousX = obj.x;
+    var previousY = obj.y;
+    var x = coord.x;
+    var y = coord.y;
+    var collisionAreasObj = [];
+    var collisionAreasList = [];
+
+    var raioObj = raio( obj.width, obj.height);
+    for(var i = 0; i < objetos.length; i++){
+        var raioObjeto = raio( objetos[i].width, objetos[i].height)
+        var distancia = distanciaAB( x, objetos[i].x, y, objetos[i].y )
+
+        console.log(raioObj + " " + raioObjeto + " " + distancia + " ")
+
+        if( distancia < (raioObj + raioObj) ){
+            console.log("colidiu");
+            debugger;
+            return true;
+        }else{
+            return false;
+        }
+        return false;
+    }
+}
+
+function raio(x, y){
+    return ( ( (x/2.0)^2 + (y/2.0)^2 )^(0.5) );
+}
+
+function distanciaAB( x1, x2, y1, y2){
+
+    return (  Math.abs(x2 - x1)^2 +  Math.abs(y2 - y1)^2  );
+}
 
 function articulateMove(obj, moves){
 
@@ -253,14 +334,45 @@ function articulateMove(obj, moves){
     }
 }
 
+//parei aqui - alguma coisa por volta desse metodo, debugar e testar
+function articulateMoveComposed(objeto, movesArray){
+    
+    var obj = objeto.obj;
+    var view = objeto.view;
+    var moves = movesArray.moves;
+    var viewMoves = movesArray.viewMoves;
+
+    for(let key in obj.directions){ 
+        if(obj.directions[key] == 1){ 
+            if(moves[key](obj)){
+                viewMoves[key](view);
+                console.log("movimento composto")
+            } 
+        } 
+    }
+
+    // for(let key in view.directions){ 
+    //     if(obj.directions[key] == 1){ 
+    //         if(moves.idle[key](obj)){
+    //             moves.view[key](obj)
+    //         } 
+    //     } 
+    // }
+}
+
 //Metodo a ser inserido no loop central de animacao geral
 function idlesLoop(objs){
+
     for(var i = 0; i < objs.length; i++) articulateMove(objs[i], moves)
 }
 
 //Metodo a ser inserido no loop central de animacao geral
 function viewLoop(obj){
     articulateMove(obj, viewMoves)
+}
+
+function lockedMoveLoop(obj, view){
+    articulateMoveComposed({obj: obj, view: view}, {moves: moves, viewMoves: viewMoves})
 }
 
 //speed iterator precisa ser melhorado
@@ -295,6 +407,11 @@ function speedIterator(axis, modulo){
     }
 
     return 0;
+}
+
+function enableMove(){
+
+    cantMove = 0;
 }
 
 //********************** End Movimentacao **********************
@@ -393,9 +510,19 @@ function animate(){
     canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
     
     //logica de objetos como idles e npcs
-    idlesLoop(objs);
+    
+    lockedMoveLoop(objs, viewStateMajor[0]);
 
-    viewLoop(viewStateMajor[0])
+    if( cantMove != 1 ){
+    
+        idlesLoop(objs);
+
+        viewLoop(viewStateMajor[0]);
+    }
+
+    enableMove();
+
+    idlesViewLoop(objs, viewStateMajor[0]);
 
     //desenho do elementos idles e npcs
     drawSquare(idleState1);
