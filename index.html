@@ -222,10 +222,8 @@ function keysManipulatorNormal(key){
     console.log(key);
     if( activeKeyCameraHoldNotifier.hasOwnProperty(key) ){
         var idleKey = activeKeyCameraHoldNotifier[key][0];
-        var viewKey = activeKeyCameraHoldNotifier[key][1];
         activeKeyNotifier[idleKey](idleState1);
-        activeGlCameraLockNotifier[key]();// parei aqui - o negocio eh se tiver pelo menos uma tecla up, ou se todas down, ai sim seta pra depois
-        //usar no metodo do articula composed
+        activeGlCameraLockNotifier[key]();
         //activeKeyViewNotifier[viewKey](viewStateMajor[0]);// não é pra notificar pois a camera fica dependente de colisao
         //activeKeyNotifier.hasOwnProperty(idleKey) ? activeKeyNotifier[idleKey](idleState1) : console.log("null") ;
         //activeKeyNotifier.hasOwnProperty(activeKeyCameraHoldNotifier[key][1]) ? activeKeyNotifier[key](idleState1) : console.log("null") ;
@@ -239,7 +237,6 @@ function keysReleaseManipulatorNormal(key){
     console.log("Soltou " + key);
     if( deactiveKeyCameraHoldNotifier.hasOwnProperty(key) ){
         var idleKey = deactiveKeyCameraHoldNotifier[key][0];
-        var viewKey = deactiveKeyCameraHoldNotifier[key][1];
         deactiveKeyNotifier[idleKey](idleState1);
         deactiveGlCameraLockNotifier[key]();
         //deactiveKeyViewNotifier[viewKey](viewStateMajor[0]);
