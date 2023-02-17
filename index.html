@@ -66,6 +66,7 @@ var viewStateMajor;
 var initialX = 250;
 var initialY = 250;
 var cantMove = 1;
+var cantMoveCamera = 1; 
 
 idleState1 = {
     x: 50,
@@ -109,10 +110,17 @@ viewState = {
     }
 }
 
+var cameraLock = {
+    "up"    : 0, 
+    "down"  : 0, 
+    "left"  : 0,
+    "right" : 0
+}
+
 
 objs = [idleState1, idleState2];
 viewStateMajor = [viewState];
-objetos = [{x: 250, y:50, width: 50, height: 50}, {x: 450, y:450, width: 20, height: 20}, {x: 150, y:350, width: 20, height: 20}];
+objetos = [{x: 250, y:50, width: 10, height: 10}, {x: 450, y:450, width: 10, height: 10}, {x: 150, y:350, width: 10, height: 10}];
 mapCoords = [{x: 250, y: 250, width: 0, height: 0}];
 translate = [{x: 0, y: 0}];
 
@@ -159,6 +167,19 @@ const deactiveKeyCameraHoldNotifier = {
     "/"             : ["ArrowRight", "l", barKeyRelease]
 }
 
+const activeGlCameraLockNotifier = {
+    "ç"     : cameraLockUp,
+    ";"     : cameraLockDown,
+    "."     : cameraLockLeft,
+    "/"     : cameraLockRight
+}
+
+const deactiveGlCameraLockNotifier = {
+    "ç"     : cameraUnlockUp,
+    ";"     : cameraUnlockDown,
+    "."     : cameraUnlockLeft,
+    "/"     : cameraUnlockRight
+}
 
 
 //lista de movimentos possiveis
@@ -203,7 +224,9 @@ function keysManipulatorNormal(key){
         var idleKey = activeKeyCameraHoldNotifier[key][0];
         var viewKey = activeKeyCameraHoldNotifier[key][1];
         activeKeyNotifier[idleKey](idleState1);
-        activeKeyViewNotifier[viewKey](viewStateMajor[0]);
+        activeGlCameraLockNotifier[key]();// parei aqui - o negocio eh se tiver pelo menos uma tecla up, ou se todas down, ai sim seta pra depois
+        //usar no metodo do articula composed
+        //activeKeyViewNotifier[viewKey](viewStateMajor[0]);// não é pra notificar pois a camera fica dependente de colisao
         //activeKeyNotifier.hasOwnProperty(idleKey) ? activeKeyNotifier[idleKey](idleState1) : console.log("null") ;
         //activeKeyNotifier.hasOwnProperty(activeKeyCameraHoldNotifier[key][1]) ? activeKeyNotifier[key](idleState1) : console.log("null") ;
     }else{
@@ -218,7 +241,8 @@ function keysReleaseManipulatorNormal(key){
         var idleKey = deactiveKeyCameraHoldNotifier[key][0];
         var viewKey = deactiveKeyCameraHoldNotifier[key][1];
         deactiveKeyNotifier[idleKey](idleState1);
-        deactiveKeyViewNotifier[viewKey](viewStateMajor[0]);
+        deactiveGlCameraLockNotifier[key]();
+        //deactiveKeyViewNotifier[viewKey](viewStateMajor[0]);
         //activeKeyNotifier.hasOwnProperty(idleKey) ? activeKeyNotifier[idleKey](idleState1) : console.log("null") ;
         //activeKeyNotifier.hasOwnProperty(activeKeyCameraHoldNotifier[key][1]) ? activeKeyNotifier[key](idleState1) : console.log("null") ;
     }else{
@@ -243,6 +267,10 @@ function cedillaKeyPress(obj){ obj.directions["up"] = 1;}
 function semiCollonKeyPress(obj){obj.directions["down"] = 1;}
 function dotKeyPress(obj){obj.directions["left"] = 1;}
 function barKeyPress(obj){obj.directions["eight"] = 1;}
+function cameraLockUp(){cameraLock.up = 1;}
+function cameraLockDown(){cameraLock.down = 1;}
+function cameraLockLeft(){cameraLock.left = 1;}
+function cameraLockRight(){cameraLock.right = 1;}
 
 function ArrowUpRelease(obj){ obj.directions["up"] = 0; }
 function ArrowDownRelease(obj){ obj.directions["down"] = 0; }
@@ -256,17 +284,22 @@ function cedillaKeyRelease(obj){ obj.directions["up"] = 0;}
 function semiCollonKeyRelease(obj){obj.directions["down"] = 0;}
 function dotKeyRelease(obj){obj.directions["left"] = 0;}
 function barKeyRelease(obj){obj.directions["eight"] = 0;}
+function cameraUnlockUp(){cameraLock.up = 0;}
+function cameraUnlockDown(){cameraLock.down = 0;}
+function cameraUnlockLeft(){cameraLock.left = 0;}
+function cameraUnlockRight(){cameraLock.right = 0;}
 
-function moveUp(obj){       return iterateWithCollideY( obj, -1);  }
-function moveDown(obj){     return iterateWithCollideY( obj, 1);   }
-function moveLeft(obj){     return iterateWithCollideX( obj, -1);  }
-function moveRight(obj){    return iterateWithCollideX( obj, 1);   }
+
+function moveUp(obj){       return iterateWithNoCollideY( obj, -1);  }
+function moveDown(obj){     return iterateWithNoCollideY( obj, 1);   }
+function moveLeft(obj){     return iterateWithNoCollideX( obj, -1);  }
+function moveRight(obj){    return iterateWithNoCollideX( obj, 1);   }
 function moveIdle(obj){     return false;}
 
-function viewMoveUp(obj){       translates( 0, 1 ); }
-function viewMoveDown(obj){     translates( 0, -1); }
-function viewMoveLeft(obj){     translates( 1, 0 ); }
-function viewMoveRight(obj){    translates( -1, 0); }
+function viewMoveUp(obj){       translates( 0, 1 )}
+function viewMoveDown(obj){     translates( 0, -1)}
+function viewMoveLeft(obj){     translates( 1, 0 )}
+function viewMoveRight(obj){    translates( -1, 0)}
 function viewMoveIdle(obj){     return;}
 
 function lockedViewIdleTryMoveUp(obj){      }
@@ -274,7 +307,7 @@ function lockedViewIdleTryMoveDown(obj){}
 function lockedViewIdleTryMoveLeft(obj){}
 function lockedViewIdleTryMoveRight(obj){}
 
-function iterateWithCollideY(obj, value){
+function iterateWithNoCollideY(obj, value){
     var incremento = speedIterator("y", value);
     if( !checkCollide(obj, {x:obj.x, y: (obj.y + incremento)}) ){
         obj.y = obj.y + incremento;
@@ -283,9 +316,9 @@ function iterateWithCollideY(obj, value){
     return false;
 }
 
-function iterateWithCollideX(obj, value){
+function iterateWithNoCollideX(obj, value){
     var incremento = speedIterator("x", value);
-    if( !checkCollide(obj, {x:obj.x, y: (obj.x + incremento)}) ){
+    if( !checkCollide(obj, {x: (obj.x + incremento), y: obj.y}) ){
         obj.x = obj.x + incremento;
         return true;
     }
@@ -299,32 +332,42 @@ function checkCollide(obj, coord){
     var y = coord.y;
     var collisionAreasObj = [];
     var collisionAreasList = [];
+    obj.x = x;
+    obj.y = y;
 
+    //console.log("================================================");
+    //ma fut mr2
     var raioObj = raio( obj.width, obj.height);
+    var objGeometricCenter = squareGeometricCenter(obj); 
+    obj.x = previousX;
+    obj.y = previousY;
+
     for(var i = 0; i < objetos.length; i++){
         var raioObjeto = raio( objetos[i].width, objetos[i].height)
-        var distancia = distanciaAB( x, objetos[i].x, y, objetos[i].y )
+        var objListGeoCenter = squareGeometricCenter(objetos[i]);
+        //console.log(obj);
+        //console.log(objListGeoCenter);
+        var distancia = distanciaAB( objGeometricCenter.xm, objListGeoCenter.xm, objGeometricCenter.ym, objListGeoCenter.ym)
+        //console.log(raioObj + " " + raioObjeto + " " + distancia + " ")
 
-        console.log(raioObj + " " + raioObjeto + " " + distancia + " ")
-
-        if( distancia < (raioObj + raioObj) ){
+        if( distancia < (raioObj + raioObjeto) ){
             console.log("colidiu");
-            debugger;
             return true;
         }else{
-            return false;
+            //return false;
         }
-        return false;
+        //return false;
     }
+    return false;
 }
 
 function raio(x, y){
-    return ( ( (x/2.0)^2 + (y/2.0)^2 )^(0.5) );
+    return ( ( (x/2.0)**2 + (y/2.0)**2 )**(0.5) );
 }
 
 function distanciaAB( x1, x2, y1, y2){
 
-    return (  Math.abs(x2 - x1)^2 +  Math.abs(y2 - y1)^2  );
+    return (  ((x2 - x1)**2 + (y2 - y1)**2)**(0.5)  );
 }
 
 function articulateMove(obj, moves){
@@ -335,19 +378,25 @@ function articulateMove(obj, moves){
 }
 
 //parei aqui - alguma coisa por volta desse metodo, debugar e testar
-function articulateMoveComposed(objeto, movesArray){
+function articulateMoveComposed(objetos, movesArray){
     
-    var obj = objeto.obj;
-    var view = objeto.view;
+    var obj = objetos.objs[0];//Refatorar/Reimplementar/Deletar pois esse obj ficou zuado, ficou 2 objetos, sendo q o 2o nao usa mais 1 view, nada haver
+    var view = objetos.view;
     var moves = movesArray.moves;
     var viewMoves = movesArray.viewMoves;
 
     for(let key in obj.directions){ 
         if(obj.directions[key] == 1){ 
             if(moves[key](obj)){
-                viewMoves[key](view);
-                console.log("movimento composto")
-            } 
+                if( anyCameraLock() ){
+                    viewMoves[key](view);
+                    console.log("movimento composto")
+                    cantMove = 1;
+                }
+            }else{
+                //cantMoveCamera = 1;
+                console.log("sem")
+            }
         } 
     }
 
@@ -371,8 +420,8 @@ function viewLoop(obj){
     articulateMove(obj, viewMoves)
 }
 
-function lockedMoveLoop(obj, view){
-    articulateMoveComposed({obj: obj, view: view}, {moves: moves, viewMoves: viewMoves})
+function lockedMoveLoop(objs, view){
+    articulateMoveComposed({objs: objs, view: view}, {moves: moves, viewMoves: viewMoves})
 }
 
 //speed iterator precisa ser melhorado
@@ -412,6 +461,17 @@ function speedIterator(axis, modulo){
 function enableMove(){
 
     cantMove = 0;
+}
+
+function enableMoveCamera(){
+ 
+    cantMoveCamera = 0;
+}
+
+function anyCameraLock(){
+    if( cameraLock.up == 0 && cameraLock.down == 0 && cameraLock.left == 0 && cameraLock.right == 0) 
+        return 0;
+    return 1;
 }
 
 //********************** End Movimentacao **********************
@@ -511,18 +571,21 @@ function animate(){
     
     //logica de objetos como idles e npcs
     
+    enableMove();
+    enableMoveCamera();
+
     lockedMoveLoop(objs, viewStateMajor[0]);
 
     if( cantMove != 1 ){
     
+        console.log("nao era pra entrar")
         idlesLoop(objs);
 
         viewLoop(viewStateMajor[0]);
     }
 
     enableMove();
-
-    idlesViewLoop(objs, viewStateMajor[0]);
+    enableMoveCamera();
 
     //desenho do elementos idles e npcs
     drawSquare(idleState1);
@@ -591,6 +654,10 @@ function init(){
 
 function refreshLogicalMap(){
     return;
+}
+
+function squareGeometricCenter(obj){
+    return {xm: (obj.x + obj.width/2.0), ym: (obj.y + obj.height/2.0) };
 }
 
 //********************* End Funcoes Geral **********************
