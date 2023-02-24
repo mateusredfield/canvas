@@ -6,142 +6,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
+
+
+<!-- ****************** css ************************* -->
 <style>
 
+    html, body{
+        box-sizing: border-box;
+        margin: 0px;
+        padding: 0px;
+    }
 
-
-html, body{
-    box-sizing: border-box;
-    margin: 0px;
-    padding: 0px;
-}
-
-.areaCanvas{
-    margin-top: 30px;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    /* width: calc((100vw - (100vw - 100%))*0.9); */
-    height: 500px;
-    width: 500px;
-    background-color: lavender;
-    border: 1px solid black;    
-}
+    .areaCanvas{
+        margin-top: 30px;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        /* width: calc((100vw - (100vw - 100%))*0.9); */
+        height: 500px;
+        width: 500px;
+        background-color: lavender;
+        border: 1px solid black;    
+    }
 
 </style>
 
+
+<!-- ************************** js ****************************-->
 <script>
 
-//**************************listener***********************************
+    //**************************listener***********************************
 
-window.addEventListener('load', init, false);
-
-
-//********************declaracos e inicializacao***********************
-
-//legado canvas
-var canvas;
-var canvasContext;
-var canvasWidth;
-var canvasHeight;
-var defaultCanvasWidth = 500;
-var defaultCanvasHeight = 500;
-
-//feature imagem q ja foi iniciada a implementacao infelizmente na master
-var idleImage;
-var idleImageWidth = 575;
-var idleImageHeight = 523;
+    window.addEventListener('load', init, false);
 
 
-idleState1 = {
-    x: 50,
-    y: 50,
-    width: 5,
-    height: 5,
-    directions: {
-        "none" : 1, 
-        "up" : 0, 
-        "down" : 0, 
-        "left": 0,
-        "right": 0
-    } 
-}
+    //********************declaracos e inicializacao***********************
 
-function initImageResources(){
-    // idleImage = new Image();
-    // idleImage.src = "assets/idleImage.png";
-    idleImage = document.getElementById("idleImageId");
-}
+    //legado canvas
+    var canvas;
+    var canvasContext;
+    var canvasWidth;
+    var canvasHeight;
+    var defaultCanvasWidth = 500;
+    var defaultCanvasHeight = 500;
 
-//********************* Trecho de Animacao *********************
-function drawSquare(obj){
-
-    var x = obj.x;
-    var y = obj.y;
-    var width = obj.width;
-    var height = obj.height;
-
-    canvasContext.fillRect(x, y, width, height);
-}
-
-function drawImage(obj){
-    canvasContext.drawImage(obj, 0, 0, idleImageWidth, idleImageHeight, 125 , 125, canvasWidth/2, canvasHeight/2);
-}
+    //feature imagem q ja foi iniciada a implementacao infelizmente na master
+    var idleImage;
+    var idleImageWidth = 575;
+    var idleImageHeight = 523;
 
 
-//********************* End Animacao *********************
+    idleState1 = {
+        x: 50,
+        y: 50,
+        width: 5,
+        height: 5,
+        directions: {
+            "none" : 1, 
+            "up" : 0, 
+            "down" : 0, 
+            "left": 0,
+            "right": 0
+        } 
+    }
+
+    function initImageResources(){
+        // idleImage = new Image();
+        // idleImage.src = "assets/idleImage.png";
+        idleImage = document.getElementById("idleImageId");
+    }
+
+    //********************* Trecho de Animacao *********************
+    function drawSquare(obj){
+
+        var x = obj.x;
+        var y = obj.y;
+        var width = obj.width;
+        var height = obj.height;
+
+        canvasContext.fillRect(x, y, width, height);
+    }
+
+    function drawImage(obj){
+        canvasContext.drawImage(obj, 0, 0, idleImageWidth, idleImageHeight, 125 , 125, canvasWidth/2, canvasHeight/2);
+    }
+
+
+    //********************* End Animacao *********************
 
 
 
-//********************* Animacao Central *********************
-//loop animacao - um apenas starta com algumas medidas e alocacaoes e a outra funcao q eh o loop em si
+    //********************* Animacao Central *********************
+    //loop animacao - um apenas starta com algumas medidas e alocacaoes e a outra funcao q eh o loop em si
 
 
-function initCanvas(){
-    canvas = document.getElementById('canvas');
-    canvasContext = canvas.getContext('2d');
-    canvasWidth = canvas.width = defaultCanvasWidth;
-    canvasHeight = canvas.height = defaultCanvasHeight;
-}
+    function initCanvas(){
+        canvas = document.getElementById('canvas');
+        canvasContext = canvas.getContext('2d');
+        canvasWidth = canvas.width = defaultCanvasWidth;
+        canvasHeight = canvas.height = defaultCanvasHeight;
+    }
 
-function animate(){
-    
-    canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
-    
-    drawSquare(idleState1);// O Idle em si
+    function animate(){
+        
+        canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
+        
+        drawSquare(idleState1);// O Idle em si
 
-    drawImage(idleImage);//idleImage é o Elemento
-    
-    requestAnimationFrame(animate);
-}
+        drawImage(idleImage);//idleImage é o Elemento
+        
+        requestAnimationFrame(animate);
+    }
 
-//*************** Funcoes de proposito Geral *******************
-function initCss(){
-    document.getElementById('canvas').style.width = defaultCanvasWidth;
-    document.getElementById('canvas').style.height = defaultCanvasHeight;
-    document.getElementById('areaCanvas').style.width = defaultCanvasWidth + "px";
-    document.getElementById('areaCanvas').style.height = defaultCanvasHeight + "px";
-}//hello
+    //*************** Funcoes de proposito Geral *******************
+    function initCss(){
+        document.getElementById('canvas').style.width = defaultCanvasWidth;
+        document.getElementById('canvas').style.height = defaultCanvasHeight;
+        document.getElementById('areaCanvas').style.width = defaultCanvasWidth + "px";
+        document.getElementById('areaCanvas').style.height = defaultCanvasHeight + "px";
+    }//hello
 
-function init(){
-    
-    initCss();
-    initCanvas();
-    initImageResources();
-    animate();
-}
-//********************* End Funcoes Geral **********************
+    function init(){
+        
+        initCss();
+        initCanvas();
+        initImageResources();
+        animate();
+    }
+    //********************* End Funcoes Geral **********************
 
 </script>
 
+
 <body>
-
+    
     <img id="idleImageId" src="assets/idleImage.png" style="display:none;" onload="initImageResources()">
-
+    
     <div class="areaCanvas" id="areaCanvas">
-        
         <canvas id="canvas">
         </canvas>
-
     </div>
     
 </body>
