@@ -51,11 +51,7 @@
     var defaultCanvasHeight = 500;
 
     //feature imagem q ja foi iniciada a implementacao infelizmente na master
-    var idleImage;
-    var idleImageWidth = 575;
-    var idleImageHeight = 523;
-
-
+    
     idleState1 = {
         x: 50,
         y: 50,
@@ -70,11 +66,52 @@
         } 
     }
 
+    //Animation Logical Variables
+    var idleImage;
+    var idleImageWidth = 575;
+    var idleImageHeight = 523;
+
+    var logicalFramePosition = 0;
+
+    //Animation 2d models
+    var dogModel = {
+        width: idleImageWidth,
+        height: idleImageHeight,
+        frameActionState: "Idle", //esse sim é um dos poquissimos idols q faz sentido
+        positionFrameActionState:
+    } 
+
+    //*************** Funcoes de proposito Geral *******************
+    function initCss(){
+        document.getElementById('canvas').style.width = defaultCanvasWidth;
+        document.getElementById('canvas').style.height = defaultCanvasHeight;
+        document.getElementById('areaCanvas').style.width = defaultCanvasWidth + "px";
+        document.getElementById('areaCanvas').style.height = defaultCanvasHeight + "px";
+    }//hello
+
+    function init(){
+        
+        initCss();
+        initCanvas();
+        initImageResources();
+        animate();
+    }
+
     function initImageResources(){
         // idleImage = new Image();
         // idleImage.src = "assets/idleImage.png";
         idleImage = document.getElementById("idleImageId");
     }
+
+    function initCanvas(){
+        canvas = document.getElementById('canvas');
+        canvasContext = canvas.getContext('2d');
+        canvasWidth = canvas.width = defaultCanvasWidth;
+        canvasHeight = canvas.height = defaultCanvasHeight;
+    }
+    //********************* End Funcoes Geral **********************
+
+
 
     //********************* Trecho de Animacao *********************
     function drawSquare(obj){
@@ -99,14 +136,6 @@
     //********************* Animacao Central *********************
     //loop animacao - um apenas starta com algumas medidas e alocacaoes e a outra funcao q eh o loop em si
 
-
-    function initCanvas(){
-        canvas = document.getElementById('canvas');
-        canvasContext = canvas.getContext('2d');
-        canvasWidth = canvas.width = defaultCanvasWidth;
-        canvasHeight = canvas.height = defaultCanvasHeight;
-    }
-
     function animate(){
         
         canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -117,23 +146,6 @@
         
         requestAnimationFrame(animate);
     }
-
-    //*************** Funcoes de proposito Geral *******************
-    function initCss(){
-        document.getElementById('canvas').style.width = defaultCanvasWidth;
-        document.getElementById('canvas').style.height = defaultCanvasHeight;
-        document.getElementById('areaCanvas').style.width = defaultCanvasWidth + "px";
-        document.getElementById('areaCanvas').style.height = defaultCanvasHeight + "px";
-    }//hello
-
-    function init(){
-        
-        initCss();
-        initCanvas();
-        initImageResources();
-        animate();
-    }
-    //********************* End Funcoes Geral **********************
 
 </script>
 
