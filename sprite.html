@@ -73,13 +73,25 @@
 
     var logicalFramePosition = 0;
 
+    //logical 2d model assign
+    var dogModel2dStates = {
+        "idle" : 0,
+        "stun" : 4
+    };
+
     //Animation 2d models
     var dogModel = {
         width: idleImageWidth,
         height: idleImageHeight,
-        frameActionState: "Idle", //esse sim é um dos poquissimos idols q faz sentido
-        positionFrameActionState:
+        spriteModel2dState: dogModel2dStates, //esse sim é um dos poquissimos idles q faz sentido
+        positionFrameActionState: 1,
+        currentState: 0,
+        currentAction: "idle"
     } 
+
+    //parei aqui, negocio é o action e o state sao 
+    models = [];
+    models["dog"] = dogModel;
 
     //*************** Funcoes de proposito Geral *******************
     function initCss(){
@@ -100,7 +112,7 @@
     function initImageResources(){
         // idleImage = new Image();
         // idleImage.src = "assets/idleImage.png";
-        idleImage = document.getElementById("idleImageId");
+        idleImage = document.getElementById("dog");
     }
 
     function initCanvas(){
@@ -124,8 +136,12 @@
         canvasContext.fillRect(x, y, width, height);
     }
 
-    function drawImage(obj){
-        canvasContext.drawImage(obj, 0, 0, idleImageWidth, idleImageHeight, 125 , 125, canvasWidth/2, canvasHeight/2);
+    function drawImage(img){
+
+        var obj = models[img.id];
+        console.log(obj.spriteModel2dState[obj.currentState])
+        canvasContext.drawImage(img, idleImageWidth * (obj.spriteModel2dState[obj.currentState]), idleImageHeight * (obj.spriteModel2dState[obj.currentAction]), 
+                                idleImageWidth, idleImageHeight, 125 , 125, canvasWidth/2, canvasHeight/2);
     }
 
 
@@ -152,7 +168,7 @@
 
 <body>
     
-    <img id="idleImageId" src="assets/idleImage.png" style="display:none;" onload="initImageResources()">
+    <img id="dog" src="assets/idleImage.png" style="display:none;" onload="initImageResources()">
     
     <div class="areaCanvas" id="areaCanvas">
         <canvas id="canvas">
