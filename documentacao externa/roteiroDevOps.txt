@@ -1,7 +1,17 @@
  
 Linha Atual
 
-    Fazer a movimentacao apenas, melhorar a logica das classes, encapsular e ler sobre padres de design q podem ajudar nisso
+    - limpar o codigo dos comentarios do sprite e possivelemene comecar logo
+      a programar    
+    - inicialmente usar energia entre regras de negocio e codigos, ou aparte tipo site co chat gp 
+    - reorganizar esses topicos pq ja esta confuso
+    - precisa ser algo simples e monetizavel, melhor errar logo e cedo     
+    - mr2 com talvez iteracoes tipo persona...
+    - iteracoes com os jogadores  
+    - mecanica de acoes ou energia misturada com calendario, talvez as sociais gastando energia de 
+      acordo com a criacao do the sins, um boneco mais carismatico tem mais facilidade com algo,
+      o mais nerd em tese teria, teria mais habilidade 
+    numero de acoes por semana ou 10 dias ou quinzena, decrescendo a medida que o tempo off aumenta
 
 
  ok - fazer o press start
@@ -18,3 +28,6 @@ Linha Atual
  - Fazer primeiro o encapsulamento e reordenacao do codigo, depois, e ver sobre padroes de design por ultimo
  - A primeira versao nao considera setInterval q talvez seja alternativa melhor
  - Talvez mudar a logica de chamada de funcoes dado q a mesma poderia estar no prorio objeto
+ - melhorar a logica das classes
+ - encapsular e ler sobre padres de design q podem ajudar nisso
+ - blockchain opcional, importante eh ser plai to earn, discutir com iutchubers qndo estiver quase pronto
