@@ -38,23 +38,44 @@ var canvasWidth;
 var canvasHeight;
 var defaultCanvasWidth = 500;
 var defaultCanvasHeight = 500;
+
+//adicionados 
 var idleImage;
 
-
-//fillsquare - desenha um quadrado simples usando fillsquare 
-function drawSquare(obj){
-    canvasContext.fillRect(obj.x, obj.y, obj.width, obj.height)
-}
-
-function initImageResources(){
-    idleImage = document.getElementById("idleImageId");
-    console.log(idleImage)
-}
-
-
 function drawImage(obj){
-    console.log(obj.src);
-    canvasContext.drawImage(obj, 0, 0, 573, 523, 0 , 0, canvasWidth, canvasHeight);
+    canvasContext.drawImage(obj, obj.xA, obj.zA, obj.spriteWidth, obj.spriteHeight, 0 , 0, canvasWidth, canvasHeight);
+}
+
+//assume todos os sprites do mesmo tamanho, e faz isso para cada modelo2d, logo a instanciacao de cenarios fica para outro lugar  
+function initLoadImageResources(imgId, spriteWidth, spriteHeight, animationStates, currentAnimationState){
+    
+    var obj = document.getElementById(imgId);
+    obj.animationStates = animationStates;
+    obj.currentAnimationState = currentAnimationState;
+    
+    obj.spriteWidth = spriteWidth;
+    obj.spriteHeight = spriteHeight;
+
+    obj = changeAnimationStateTo(obj, currentAnimationState)
+    
+    return obj;
+}
+
+function changeAnimationStateTo(obj, currentAnimationState){
+    
+    obj.currentAnimationState = currentAnimationState;
+    obj.zA =  obj.animationStates[currentAnimationState.action].position * obj.spriteHeight;//cada acao eh uma linha, assumindo sprites de tamanhos iguais 
+    obj.xA =  currentAnimationState.actionState * obj.spriteWidth;      
+    obj.zB = obj.zA + obj.spriteHeight;
+    obj.xB = obj.xA + obj.spriteWidth;
+    
+    return obj;
+}
+
+function incrementAnimationActionState(obj, currentAnimationState){
+
+    obj.currentAnimationState.actionState = (currentAnimationState.actionState + 1) % (obj.animationStates[currentAnimationState.action].maxStates);
+    return changeAnimationStateTo(obj, obj.currentAnimationState);
 }
 //********************* End Animacao *********************
 
@@ -64,8 +85,15 @@ function drawImage(obj){
 function init(){
     initCss();
     initCanvas();
-    //animate();
-    //initImageResources();
+
+    //adicionado
+    var states = [];
+    //remover pois isso eh da instanciacao de cada modelo2d
+    states["idle"] = {position:0, maxStates:7};
+    states["rolling"] = {position:6, maxStates:7};
+    idleImage = initLoadImageResources("idleImageId", 575, 523, states, {action: "idle", actionState:0});
+    
+    animate();    
 }
 
 function initCss(){
@@ -90,7 +118,9 @@ function animate(){
     
     canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
     
+    //adicionado
     drawImage(idleImage);
+    idleImage = incrementAnimationActionState(idleImage, idleImage.currentAnimationState);
    
     requestAnimationFrame(animate);
 }
@@ -107,7 +137,8 @@ function animate(){
 <body>
 
     <!-- jeito pratico de carregar sprites, esconde e depois exibe em outro canto  -->
-    <img id="idleImageId" src="assets/idleImage.png" style="display:none;" onload="initImageResources()">
+    <!-- <img id="idleImageId" src="assets/idleImage.png" style="display:none;" onload="initImageResources()"> -->
+    <img id="idleImageId" src="assets/idleImage.png" style="display:none;">
 
     <!-- apenas area canvas -->
     <div class="areaCanvas" id="areaCanvas">
