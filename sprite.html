@@ -29,6 +29,8 @@ html, body{
 
 <script>
 
+
+//parei aqui - frame rate- o certo nao eh esperar com sleep mas sim pegar a diferenca de tempo entre as iteracoes e ver se passou 45ms   
 //documentacao interna
 window.addEventListener('load', init, false);
 
@@ -41,6 +43,14 @@ var defaultCanvasHeight = 500;
 
 //adicionados 
 var idleImage;
+var tempo = performance.now();
+var nubFrameRate = 25;
+
+
+//*****************************************Logica de temporizacao - frame rate**************************************************
+
+
+//******************************************************************************************************************************
 
 function drawImage(obj){
     canvasContext.drawImage(obj, obj.xA, obj.zA, obj.spriteWidth, obj.spriteHeight, 0 , 0, canvasWidth, canvasHeight);
@@ -72,6 +82,7 @@ function changeAnimationStateTo(obj, currentAnimationState){
     return obj;
 }
 
+//refatorar pois nao precisa do segundo argumento que a priori eh justamente algo q o obj ja tem
 function incrementAnimationActionState(obj, currentAnimationState){
 
     obj.currentAnimationState.actionState = (currentAnimationState.actionState + 1) % (obj.animationStates[currentAnimationState.action].maxStates);
@@ -90,6 +101,7 @@ function init(){
     var states = [];
     //remover pois isso eh da instanciacao de cada modelo2d
     states["idle"] = {position:0, maxStates:7};
+    states["stunned"] = {position:4, maxStates:9};
     states["rolling"] = {position:6, maxStates:7};
     idleImage = initLoadImageResources("idleImageId", 575, 523, states, {action: "idle", actionState:0});
     
@@ -114,20 +126,31 @@ function initCanvas(){
 
 
 //********************* Animacao Central *********************
-function animate(){
+async function animate(){
+    
+    //await sleep(45);
     
     canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
     
+    var diff = performance.now() - tempo;
+    if( (diff) > nubFrameRate){
+        tempo = performance.now();
+    }
     //adicionado
     drawImage(idleImage);
-    idleImage = incrementAnimationActionState(idleImage, idleImage.currentAnimationState);
+    diff > nubFrameRate ? idleImage = incrementAnimationActionState(idleImage, idleImage.currentAnimationState) : 1 == 1;
    
+    //adicionado - frame rate
     requestAnimationFrame(animate);
 }
 
 //******************* End Animacao Central *******************
 
 
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 
 
