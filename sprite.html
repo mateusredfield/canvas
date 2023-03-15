@@ -71,6 +71,7 @@ function initLoadImageResources(imgId, spriteWidth, spriteHeight, animationState
     return obj;
 }
 
+//muda o estado total com base em action (anda, pula, rola), e actionstate (anda sprite 1, anda sprite 2)
 function changeAnimationStateTo(obj, currentAnimationState){
     
     obj.currentAnimationState = currentAnimationState;
@@ -154,13 +155,10 @@ function sleep(ms) {
 
 
 
-
 </script>
 
 <body>
-
-    <!-- jeito pratico de carregar sprites, esconde e depois exibe em outro canto  -->
-    <!-- <img id="idleImageId" src="assets/idleImage.png" style="display:none;" onload="initImageResources()"> -->
+    
     <img id="idleImageId" src="assets/idleImage.png" style="display:none;">
 
     <!-- apenas area canvas -->
