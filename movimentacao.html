@@ -48,28 +48,10 @@ var canvasContext;
 var canvasWidth;
 var canvasHeight;
 var x = 0;
-var possibleMoves = [];
 var idleState1;
-var idleState2;
-var objs = [];
-var estadoAtual = 0;
-//var estados = [[telaInicial], [startAnimation], [startAnimation, animate]];
-var speedIteratorX = 0;
-var speedIteratorY = 0;
-var maxSpeedX = 2;
-var maxSpeedY = 2;
+var objs;
 var defaultCanvasWidth = 500;
 var defaultCanvasHeight = 500;
-var logicalMap = [];
-var idleState1;
-var idleState2;
-var objetos;
-var viewState;
-var viewStateMajor;
-var initialX = 250;
-var initialY = 250;
-var cantMove = 1;
-var cantMoveCamera = 1;
 var dist = 1; 
 
 idleState1 = {
@@ -87,11 +69,6 @@ idleState1 = {
 }
 
 objs = [idleState1];
-//viewStateMajor = [viewState];
-//objetos = [{x: 250, y:50, width: 10, height: 10}, {x: 450, y:450, width: 10, height: 10}, {x: 150, y:350, width: 10, height: 10}];
-//mapCoords = [{x: 250, y: 250, width: 0, height: 0}];
-translate = [{x: 0, y: 0}];
-
 //************************* Trecho de Movimentacao ***********************
 const keyPressRelease = {
     "ArrowUp"       : up,
@@ -100,35 +77,23 @@ const keyPressRelease = {
     "ArrowRight"    : right
 }
 
-//lista de movimentos possiveis
-// const moves = {
-//     "up": moveUp,
-//     "down": moveDown,
-//     "left": moveLeft,
-//     "right": moveRight,
-//     "none" : moveIdle
-// }
-
-
-//********************* Captura de teclas ************************
+//********************* Captura de teclas e Setagem de Direcoes ************************
+//Ideia eh apenas setar as direcoes e valores pra qndo o loop passar ele fazer os incrementos
 //Precisa capturar pq o hardware ou o evento eh retardado e pega soh a primeira inves de ser continuo 
+
 
 //obervadores e manipuladores de valores de entrada
 function observadorTeclasDown(e){
     keysManipulator(e.key, "down");
-    //keysManipulatorCameraHold(e.key);
 }
 
 function observadorTeclasUp(e){
     keysManipulator(e.key, "up");
-    //keysReleaseManipulatorCameraHold(e.key);
 }
 
-//vai usar uma das subsequentes
 function keysManipulator(key, upDown){
     
     //dava pra ser mais simples usando nome da funcao do dom 
-    console.log(key);
     if(keyPressRelease.hasOwnProperty(key)) {
         keyPressRelease[key](idleState1, upDown)
     }      
@@ -171,33 +136,11 @@ function logics(){
 
 //************************ End Loops ************************
 
-function raio(x, y){
-    return ( ( (x/2.0)**2 + (y/2.0)**2 )**(0.5) );
-}
 
-function distanciaAB( x1, x2, y1, y2){
-    return (  ((x2 - x1)**2 + (y2 - y1)**2)**(0.5)  );
-}
-//********************** End Movimentacao **********************
-
-//************************ Vizualizacao ************************
-
-function translates(x, y){
-    
-    for(var i = 0; i < objs.length; i++){
-        translate2dX(objs[i], x);
-        translate2dY(objs[i], y);
-    }
-
-    for(var i = 0; i < objetos.length; i++){
-        translate2dX(objetos[i], x);
-        translate2dY(objetos[i], y);
-    }
-}
+//************************ translacoes ************************
 
 function translate2dX(elemento, dist){
     elemento.x = elemento.x  + dist;
-    //console.log(elemento.x);
 } 
 
 function translate2dY(elemento, dist){
@@ -208,7 +151,6 @@ function translate2dY(elemento, dist){
 
 
 //********************* Trecho de Animacao *********************
-//obj.x, obj,ips, obj.width, obj.height
 function drawSquare(obj){
 
     var x = obj.x;
