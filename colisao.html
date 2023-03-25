@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<style>
+
+/*Ok - limpando as laterais do navegador */
+html, body{
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+}
+
+/*Ok - centralizando a area onde fica o canvas*/
+.areaCanvas{
+    margin-top: 30px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    /* width: calc((100vw - (100vw - 100%))*0.9); */
+    height: 500px;
+    width: 500px;
+    background-color: lavender;
+    border: 1px solid black;    
+}
+
+</style>
+
+<script>
+
+//documentacao interna
+    //precisa ficar simples pra aceitar mais funcionalidades
+    //precisa ficar claro q nao deve-se seguir o exemplo mais complexo do joguin
+    //cada vez q adiciona uma tecla precisa fazer um caminho mto burocratico
+    //em facilidade de codigo
+
+
+document.addEventListener('keydown', observadorTeclasDown, false)
+document.addEventListener('keyup', observadorTeclasUp, false)
+window.addEventListener('load', init, false);
+
+var canvas;
+var canvasContext;
+var canvasWidth;
+var canvasHeight;
+var x = 0;
+var idleState1;
+var objs;
+var defaultCanvasWidth = 200;
+var defaultCanvasHeight = 200;
+var dist = 1; 
+
+idleState1 = {
+    x: 50,
+    y: 50,
+    width: 5,
+    height: 5,
+    directions: {
+        "none" : 1, 
+        "up" : 0, 
+        "down" : 0, 
+        "left": 0,
+        "right": 0
+    } 
+}
+
+idleState2 = {
+    x: 100,
+    y: 100,
+    width: 25,
+    height: 25,
+    directions: {
+        "none" : 1, 
+        "up" : 0, 
+        "down" : 0, 
+        "left": 0,
+        "right": 0
+    } 
+}
+
+//************************* Trecho de Movimentacao ***********************
+const keyPressRelease = {
+    "ArrowUp"       : up,
+    "ArrowDown"     : down,
+    "ArrowLeft"     : left,
+    "ArrowRight"    : right
+}
+
+objs = [idleState1, idleState2];
+
+
+var jogador = idleState1;
+var externos = [idleState2];
+//********************* Captura de teclas e Setagem de Direcoes ************************
+//Ideia eh apenas setar as direcoes e valores pra qndo o loop passar ele fazer os incrementos
+//Precisa capturar pq o hardware ou o evento eh retardado e pega soh a primeira inves de ser continuo 
+
+
+//obervadores e manipuladores de valores de entrada
+function observadorTeclasDown(e){
+    keysManipulator(e.key, "down");
+}
+
+function observadorTeclasUp(e){
+    keysManipulator(e.key, "up");
+}
+
+function keysManipulator(key, upDown){
+    
+    if(keyPressRelease.hasOwnProperty(key)) {
+        keyPressRelease[key](idleState1, upDown)
+    }      
+}
+
+//Setagem de direcao, seta pra deixar o loop logico agir, ele q faz
+
+//falta mudar essa funcao pra ler o estado e contexto do obj e ver quais funcoes usar  
+//ver se dir deveria ficar no obj
+//simplificar ainda pra 1 linha
+//esse evento ferra td e ai precisa so setar a orientacao e deixar o loop cuidar do resto
+function up(obj, dir)   {
+    if(dir == "down"){obj.directions.up = 1}
+    if(dir == "up"){obj.directions.up = 0}
+}
+function down(obj, dir) {
+    if(dir == "down"){obj.directions.down = 1}
+    if(dir == "up"){obj.directions.down = 0}
+}
+function left(obj, dir) {
+    if(dir == "down"){obj.directions.left= 1}
+    if(dir == "up"){obj.directions.left = 0}
+}
+function right(obj, dir){
+    if(dir == "down"){obj.directions.right = 1}
+    if(dir == "up"){obj.directions.right = 0}
+}
+//********************** End Captura de Teclas **********************
+
+//************************ Loops ************************
+
+//essa funcao era pra ser uma logica de efetivacao de valores, como velocidade q nao eh
+//aplicada na hora certa por hardware evento tosco, entao essa logics seria a aplicacao
+// de qq coisa ao longo do tempo, seria a aplicacao do valor em si e iteracao do mesm tb  
+function logics(objs){
+
+
+    objs.forEach( elemento => {
+        if(elemento.directions["up"] == 1){translate2dY(elemento, -dist)}
+        if(elemento.directions["down"] == 1){translate2dY(elemento, dist)}
+        if(elemento.directions["left"] == 1){translate2dX(elemento, -dist)}
+        if(elemento.directions["right"] == 1){translate2dX(elemento, dist)}
+    })
+
+}
+
+//************************ End Loops ************************
+
+
+//************************ translacoes ************************
+
+function translate2dX(elemento, dist){
+    elemento.x = elemento.x  + dist;
+    if( !chekcCollideAllCirc(elemento, externos)) return 1;
+    elemento.x = elemento.x - dist; 
+} 
+
+function translate2dY(elemento, dist){
+    elemento.y = elemento.y  + dist;
+    if( !chekcCollideAllCirc(elemento, externos)) return 1;
+    elemento.y = elemento.y - dist;
+}
+//**************************************************************
+
+
+
+//********************* Trecho de Animacao *********************
+function drawSquare(obj){
+
+    var x = obj.x;
+    var y = obj.y;
+    var width = obj.width;
+    var height = obj.height;
+
+    canvasContext.fillRect(x, y, width, height);
+}
+
+
+//********************* End Animacao *********************
+
+
+
+//********************* Animacao Central *********************
+//loop animacao - um apenas starta com algumas medidas e alocacaoes e a outra funcao q eh o loop em si
+
+
+function animate(){
+    
+    canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
+    
+    logics(objs);//logica de mov
+    drawSquare(idleState1);
+    drawSquare(idleState2);
+    
+    requestAnimationFrame(animate);
+}
+
+//******************* End Animacao Central *******************
+
+
+//*************** Funcoes de proposito Geral *******************
+
+//colisao com circulos
+//era pra cada obj ter seu centro de massa
+function checkCollide(obj, alvo){    
+    var raioA = raio(obj.width, obj.height);
+    var raioB = raio(alvo.width, alvo.height);
+    var distancia = distanciaAB(obj.x + obj.width/2, alvo.x + alvo.width/2, obj.y + obj.height/2, alvo.y +alvo.height/2 )
+    console.log(raioA + " " + raioB + " " + distancia);
+    if(raioA + raioB >= distancia) return 1;
+}
+
+function chekcCollideAllCirc(obj, objs){
+    
+    for( var i = 0; i < objs.length; i++ ){
+        if(checkCollide(obj, objs[i])) return 1;
+    }
+    
+} 
+
+//raio Externo de retangulo
+function raio(x, y){
+    return ( ( (x/2.0)**2 + (y/2.0)**2 )**(0.5) );
+}
+
+function distanciaAB( x1, x2, y1, y2){
+    return (  ((x2 - x1)**2 + (y2 - y1)**2)**(0.5)  );
+}
+
+
+
+function initCanvas(){
+    canvas = document.getElementById('canvas');
+    canvasContext = canvas.getContext('2d');
+    canvasWidth = canvas.width = defaultCanvasWidth;
+    canvasHeight = canvas.height = defaultCanvasHeight;
+    //telaInicial();
+    animate();
+}
+
+function initCss(){
+    //document.getElementById('canvas').style.
+    document.getElementById('canvas').style.width = defaultCanvasWidth;
+    document.getElementById('canvas').style.height = defaultCanvasHeight;
+    //console.log(document.getElementById('canvas').style.width);
+    document.getElementById('areaCanvas').style.width = defaultCanvasWidth + "px";
+    document.getElementById('areaCanvas').style.height = defaultCanvasHeight + "px";
+}
+
+function init(){
+    
+    initCss();
+    initCanvas();
+}
+
+//********************* End Funcoes Geral **********************
+
+</script>
+
+<body>
+
+    <div onclick="init()" class="areaCanvas" id="areaCanvas">
+        
+        <canvas id="canvas">
+        </canvas>
+
+    </div>
+    
+</body>
+</html>
