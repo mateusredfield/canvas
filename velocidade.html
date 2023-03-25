@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<style>
+
+/*Ok - limpando as laterais do navegador */
+html, body{
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+}
+
+/*Ok - centralizando a area onde fica o canvas*/
+.areaCanvas{
+    margin-top: 30px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    /* width: calc((100vw - (100vw - 100%))*0.9); */
+    height: 500px;
+    width: 500px;
+    background-color: lavender;
+    border: 1px solid black;    
+}
+
+</style>
+
+<script>
+
+//documentacao interna
+    //precisa ficar simples pra aceitar mais funcionalidades
+    //precisa ficar claro q nao deve-se seguir o exemplo mais complexo do joguin
+    //cada vez q adiciona uma tecla precisa fazer um caminho mto burocratico
+    //em facilidade de codigo
+
+
+document.addEventListener('keydown', observadorTeclasDown, false)
+document.addEventListener('keyup', observadorTeclasUp, false)
+window.addEventListener('load', init, false);
+
+var canvas;
+var canvasContext;
+var canvasWidth;
+var canvasHeight;
+var x = 0;
+var idleState1;
+var objs;
+var defaultCanvasWidth = 500;
+var defaultCanvasHeight = 500;
+var dist = 1; 
+
+idleState1 = {
+    x: 50,
+    y: 50,
+    width: 5,
+    height: 5,
+    directions: {
+        "none" : 1, 
+        "up" : 0, 
+        "down" : 0, 
+        "left": 0,
+        "right": 0
+    },
+    fisica: {
+        "inertiaX": 1,
+        "inertiaY": 1,
+        "speedX" : 1,
+        "speedY" : 1
+    }
+    //pastMoves: []
+}
+
+//************************* Trecho de Movimentacao ***********************
+const keyPressRelease = {
+    "ArrowUp"       : up,
+    "ArrowDown"     : down,
+    "ArrowLeft"     : left,
+    "ArrowRight"    : right
+}
+
+// const cameraKeyPressRelease = {
+//     "o"       : up,
+//     "l"       : down,
+//     "k"       : left,
+//     "ç"       : right
+// }
+
+objs = [idleState1];
+//********************* Captura de teclas e Setagem de Direcoes ************************
+//Ideia eh apenas setar as direcoes e valores pra qndo o loop passar ele fazer os incrementos
+//Precisa capturar pq o hardware ou o evento eh retardado e pega soh a primeira inves de ser continuo 
+
+
+//obervadores e manipuladores de valores de entrada
+function observadorTeclasDown(e){
+    keysManipulator(e.key, "down");
+}
+
+function observadorTeclasUp(e){
+    keysManipulator(e.key, "up");
+}
+
+//essa funcao q diz se 
+function keysManipulator(key, upDown){
+    
+    //movimento jogador
+    if(keyPressRelease.hasOwnProperty(key)) {
+        keyPressRelease[key](idleState1, upDown)
+    }
+
+    //dava pra ser mais simples usando nome da funcao do dom 
+    // if(cameraKeyPressRelease.hasOwnProperty(key)) {        
+    //     objs.forEach(objeto => {cameraKeyPressRelease[key](objeto, upDown)}); 
+    // }      
+}
+
+function up(obj, dir)   {
+    if(dir == "down"){obj.directions.up = 1}
+    if(dir == "up"){obj.directions.up = 0}
+}
+function down(obj, dir) {
+    if(dir == "down"){obj.directions.down = 1}
+    if(dir == "up"){obj.directions.down = 0}
+}
+function left(obj, dir) {
+    if(dir == "down"){obj.directions.left= 1}
+    if(dir == "up"){obj.directions.left = 0}
+}
+function right(obj, dir){
+    if(dir == "down"){obj.directions.right = 1}
+    if(dir == "up"){obj.directions.right = 0}
+}
+//********************** End Captura de Teclas **********************
+
+//************************ Loops ************************
+
+function logics(objs){
+
+    objs.forEach( elemento => {
+        if(elemento.directions["up"] == 1){translate2dY(elemento, -dist)}
+        if(elemento.directions["down"] == 1){translate2dY(elemento, dist)}
+        if(elemento.directions["left"] == 1){translate2dX(elemento, -dist)}
+        if(elemento.directions["right"] == 1){translate2dX(elemento, dist)}
+    })
+
+}
+
+//************************ End Loops ************************
+
+
+//************************ translacoes ************************
+
+function translate2dX(elemento, dist){
+    elemento.x = elemento.x  + dist;
+} 
+
+function translate2dY(elemento, dist){
+    elemento.y = elemento.y  + dist;
+}
+//**************************************************************
+
+
+
+//********************* Trecho de Animacao *********************
+function drawSquare(obj){
+
+    var x = obj.x;
+    var y = obj.y;
+    var width = obj.width;
+    var height = obj.height;
+
+    canvasContext.fillRect(x, y, width, height);
+}
+
+
+//********************* End Animacao *********************
+
+
+
+//********************* Animacao Central *********************
+//loop animacao - um apenas starta com algumas medidas e alocacaoes e a outra funcao q eh o loop em si
+
+
+function initCanvas(){
+    canvas = document.getElementById('canvas');
+    canvasContext = canvas.getContext('2d');
+    canvasWidth = canvas.width = defaultCanvasWidth;
+    canvasHeight = canvas.height = defaultCanvasHeight;
+    //telaInicial();
+    animate();
+}
+
+function animate(){
+    
+    canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
+    
+    logics(objs);//logica de mov
+    drawSquare(idleState1);
+    drawSquare(idleState2);
+    
+    requestAnimationFrame(animate);
+}
+
+//******************* End Animacao Central *******************
+
+
+//*************** Funcoes de proposito Geral *******************
+
+function initCss(){
+    //document.getElementById('canvas').style.
+    document.getElementById('canvas').style.width = defaultCanvasWidth;
+    document.getElementById('canvas').style.height = defaultCanvasHeight;
+    //console.log(document.getElementById('canvas').style.width);
+    document.getElementById('areaCanvas').style.width = defaultCanvasWidth + "px";
+    document.getElementById('areaCanvas').style.height = defaultCanvasHeight + "px";
+}
+
+function init(){
+    
+    initCss();
+    initCanvas();
+}
+
+//********************* End Funcoes Geral **********************
+
+</script>
+
+<body>
+
+    <div onclick="init()" class="areaCanvas" id="areaCanvas">
+        
+        <canvas id="canvas">
+        </canvas>
+
+    </div>
+    
+</body>
+</html>
