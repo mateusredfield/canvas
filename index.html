@@ -153,13 +153,13 @@ function logics(objs){
 
 function translate2dX(elemento, dist){
     elemento.x = elemento.x  + dist;
-    if( !chekcCollideAllCirc(elemento, externos)) return 1;
+    if( !checkCollideAllCirc(elemento, externos)) return 1;
     elemento.x = elemento.x - dist; 
 } 
 
 function translate2dY(elemento, dist){
     elemento.y = elemento.y  + dist;
-    if( !chekcCollideAllCirc(elemento, externos)) return 1;
+    if( !checkCollideAllCirc(elemento, externos)) return 1;
     elemento.y = elemento.y - dist;
 }
 
@@ -231,6 +231,7 @@ function animate(){
     }
     //adicionado
     drawImage(idleImage);
+    drawSquare(idleState2);
     diff > nubFrameRate ? idleImage = incrementAnimationActionState(idleImage, idleImage.currentAnimationState) : 1 == 1;
 
     
@@ -238,14 +239,14 @@ function animate(){
 }
 
 function checkCollide(obj, alvo){    
-    var raioA = raio(obj.width, obj.height);
-    var raioB = raio(alvo.width, alvo.height);
+    var raioA = raioMenor(obj.width, obj.height);
+    var raioB = raioMenor(alvo.width, alvo.height);
     var distancia = distanciaAB(obj.x + obj.width/2, alvo.x + alvo.width/2, obj.y + obj.height/2, alvo.y +alvo.height/2 )
     console.log(raioA + " " + raioB + " " + distancia);
     if(raioA + raioB >= distancia) return 1;
 }
 
-function chekcCollideAllCirc(obj, objs){
+function checkCollideAllCirc(obj, objs){
     
     for( var i = 0; i < objs.length; i++ ){
         if(checkCollide(obj, objs[i])) return 1;
@@ -255,6 +256,10 @@ function chekcCollideAllCirc(obj, objs){
 
 function raio(x, y){
     return ( ( (x/2.0)**2 + (y/2.0)**2 )**(0.5) );
+}
+
+function raioMenor(altura, largura){
+    return altura/2;
 }
 
 function distanciaAB( x1, x2, y1, y2){
