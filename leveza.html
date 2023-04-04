@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+<script>
+
+
+
+    class pessoa{
+        
+        name;
+        age;
+        
+        constructor(name, age){
+
+            this.name = name;
+            this.age = age;
+
+        }
+    }
+
+    class cliente extends pessoa{
+
+        gastos;
+        // name;
+        // age;
+
+        constructor(gastos, name, age){
+
+            super(name, age);
+            this.gastos = gastos;
+
+        }
+
+    }
+
+
+    var naosei = new cliente(10, 'naosei', 34)
+    console.log(naosei);
+
+
+    // window.addEventListener('load',init)
+    // function init(){
+
+
+    //     // var naosei = new cliente(10, 'naosei', 34)
+        
+    //     // console.log(naosei);
+    // }
+
+
+
+
+</script>
+</head>
+<body>
+    
+</body>
+</html>
