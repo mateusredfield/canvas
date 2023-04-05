@@ -56,7 +56,7 @@ var canvasHeight;
 var x = 0;
 var idleState1;
 var objs;
-var defaultCanvasWidth = 200;
+var defaultCanvasWidth = 500;
 var defaultCanvasHeight = 200;
 var dist = 1; 
 
@@ -66,7 +66,6 @@ var idleImage;
 var idleImage2;
 var tempo = performance.now();
 var nubFrameRate = 25;
-
 
 
 class idleState{
@@ -102,10 +101,10 @@ idleState1 = {
 }
 
 idleState2 = {
-    x: 100,
+    x: 200,
     y: 100,
-    width: 25,
-    height: 25,
+    width: 100,
+    height: 100,
     directions: {
         "none" : 1, 
         "up" : 0, 
@@ -205,6 +204,11 @@ function drawImage(obj){
     canvasContext.drawImage(obj, obj.xA, obj.zA, obj.spriteWidth, obj.spriteHeight, obj.idleState.x , obj.idleState.y, obj.idleState.width, obj.idleState.height);
 }
 
+function drawImageInverted(obj){
+    //console.log(obj.idleState);
+    canvasContext.drawImage(obj, obj.xA, obj.zA, obj.spriteWidth, obj.spriteHeight, obj.idleState.x , obj.idleState.y, obj.idleState.width, obj.idleState.height);
+}
+
 //assume todos os sprites do mesmo tamanho, e faz isso para cada modelo2d, logo a instanciacao de cenarios fica para outro lugar  
 function initLoadImageResources(idleState, imgId, spriteWidth, spriteHeight, animationStates, currentAnimationState){
     
@@ -300,10 +304,13 @@ function init(){
     states["idle"] = {position:0, maxStates:7};
     states["stunned"] = {position:4, maxStates:9};
     states["rolling"] = {position:6, maxStates:7};
-    idleImage = initLoadImageResources( idleState1 ,"idleImageId", 575, 523, states, {action: "idle", actionState:0});
-    idleImage2 = initLoadImageResources( new idleState(idleState1), "idleImageId2", 575, 523, states, {action: "idle", actionState:0}  )
-    idleImage2.idleState.x = 50;
-    idleImage2.idleState.y = 0;
+    idleImage = initLoadImageResources( idleState1,"idleImageId", 575, 523, states, {action: "idle", actionState:0});
+    idleImage2 = initLoadImageResources( idleState2, "idleImageId2", 575, 523, states, {action: "idle", actionState:0}  )
+    
+    idleImage.idleState.x = 0;
+    idleImage.idleState.y = defaultCanvasHeight * 0.7 - idleImage.idleState.height;
+    idleImage2.idleState.x = defaultCanvasWidth - idleImage2.idleState.width;
+    idleImage2.idleState.y = defaultCanvasHeight * 0.7 - idleImage.idleState.height;
     
     console.log("iniciou")
     initCanvas();
@@ -337,7 +344,7 @@ function animate(){
     }
     //adicionado
     drawImage(idleImage);
-    drawSquare(idleState2);
+    //drawSquare(idleState2);
     drawImage(idleImage2);
     drawSquare({x: 0, y: canvas.height * 0.7, width: canvas.width, height: canvas.height * 0.3});
     diff > nubFrameRate ? idleImage = incrementAnimationActionState(idleImage, idleImage.currentAnimationState) : 1 == 1;
