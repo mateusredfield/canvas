@@ -66,26 +66,8 @@ var idleImage;
 var idleImage2;
 var tempo = performance.now();
 var nubFrameRate = 25;
-var grounds;
-
-
-class idleState{
-
-    constructor(obj){
-        this.x = obj.x
-        this.y = obj.y
-        this.width = obj.width
-        this.height = obj.height
-        this.directions = { up: obj.directions.up,
-                            down: obj.directions.down,
-                            left: obj.directions.left,
-                            right: obj.directions.right
-        }
-    }
-
-}
-
-
+var grounds = [];
+var stageGround; 
 
 idleState1 = {
     x: 0,
@@ -121,13 +103,25 @@ idleState2 = {
 }
 
 
-//esse obj eh diferente e deve receber os bounds alem de ser dinamica pois muda conforme o jogo   
-grounds = [];
+groundables = [];
 
 class idleState{
 
     constructor(obj){
+        
         this.x = obj.x
+        this.y = obj.y
+        this.width = obj.width
+        this.height = obj.height
+        this.directions = {
+            "none" : obj.directions.none, 
+            "up" : obj.directions.up, 
+            "down" : obj.directions.down, 
+            "left": obj.directions.left,
+            "right": obj.directions.right,
+            "Q" : obj.directions.Q
+        } 
+        this.speed = obj.speed
     }
 }
 
@@ -322,6 +316,11 @@ function checkCollide(obj, alvo){
     if(raioA + raioB >= distancia) return 1;
 }
 
+//parei aqui
+function checkCollideGround(obj, alvo){    
+    
+}
+
 function checkCollideAllCirc(obj, objs){
     
     for( var i = 0; i < objs.length; i++ ){
@@ -329,6 +328,14 @@ function checkCollideAllCirc(obj, objs){
     }
     
 } 
+
+function checkCollideAllGrounds(obj, objs){
+    
+    for( var i = 0; i < objs.length; i++ ){
+        if(checkCollideGround(obj, objs[i])) return 1;
+    }    
+}
+
 
 function raio(x, y){
     return ( ( (x/2.0)**2 + (y/2.0)**2 )**(0.5) );
@@ -363,7 +370,7 @@ function initCanvas(){
     canvasWidth = canvas.width = defaultCanvasWidth;
     canvasHeight = canvas.height = defaultCanvasHeight;
     //telaInicial();
-    animate();
+    //animate();
 }
 
 function initCss(){
@@ -378,6 +385,7 @@ function initCss(){
 function init(){
     
     initCss();
+    initCanvas();
 
 
     //adicionado
@@ -391,11 +399,19 @@ function init(){
     
     idleImage.idleState.x = 0;
     idleImage.idleState.y = defaultCanvasHeight * 0.7 - idleImage.idleState.height;
+
     idleImage2.idleState.x = defaultCanvasWidth - idleImage2.idleState.width;
     idleImage2.idleState.y = defaultCanvasHeight * 0.7 - idleImage.idleState.height;
+
+    stageGround = new idleState(idleState1);
+    stageGround.x = 0;
+    stageGround.y = canvasHeight * 0.7;
+    stageGround.width = canvasWidth;
+    stageGround.height = canvasHeight * 0.3;
+    groundables.push(stageGround);
+
     
-    console.log("iniciou")
-    initCanvas();
+    animate();
 }
 
 
@@ -425,10 +441,11 @@ function animate(){
         tempo = performance.now();
     }
     //adicionado
+    drawSquare(stageGround)
     drawImage(idleImage);
     //drawSquare(idleState2);
     drawImage(idleImage2);
-    drawSquare({x: 0, y: canvas.height * 0.7, width: canvas.width, height: canvas.height * 0.3});
+    //drawSquare({x: 0, y: canvas.height * 0.7, width: canvas.width, height: canvas.height * 0.3});
     diff > nubFrameRate ? idleImage = incrementAnimationActionState(idleImage, idleImage.currentAnimationState) : 1 == 1;
     diff > nubFrameRate ? idleImage2 = incrementAnimationActionState(idleImage2, idleImage2.currentAnimationState) : 1 == 1;
     
