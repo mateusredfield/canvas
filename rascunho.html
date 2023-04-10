@@ -66,6 +66,7 @@ var idleImage;
 var idleImage2;
 var tempo = performance.now();
 var nubFrameRate = 25;
+var grounds;
 
 
 class idleState{
@@ -96,9 +97,11 @@ idleState1 = {
         "up" : 0, 
         "down" : 0, 
         "left": 0,
-        "right": 0
+        "right": 0,
+        "Q" : 0
     }, 
-    speed: 5
+    speed: 5,
+    moveStates:{}
 }
 
 idleState2 = {
@@ -111,18 +114,35 @@ idleState2 = {
         "up" : 0, 
         "down" : 0, 
         "left": 0,
-        "right": 0
+        "right": 0,
+        "Q" : 0
     }, 
     speed: 5
 }
 
 
+//esse obj eh diferente e deve receber os bounds alem de ser dinamica pois muda conforme o jogo   
+grounds = [];
 
+class idleState{
+
+    constructor(obj){
+        this.x = obj.x
+    }
+}
+
+
+
+
+
+
+//movimentacao
 const keyPressRelease = {
     "ArrowUp"       : up,
     "ArrowDown"     : down,
     "ArrowLeft"     : left,
-    "ArrowRight"    : right
+    "ArrowRight"    : right,
+    "Q"             : uping,
 }
 
 objs = [idleState1, idleState2];
@@ -164,6 +184,13 @@ function right(obj, dir){
     if(dir == "up"){obj.directions.right = 0}
 }
 
+function uping(obj, dir){
+    if(dir == "down"){obj.directions.Q = 1}
+    if(dir == "up"){obj.directions.Q = 0}
+}
+
+
+
 function logics(objs){
 
 
@@ -172,6 +199,7 @@ function logics(objs){
         if(elemento.directions["down"] == 1){translate2dY(elemento, elemento.speed)}
         if(elemento.directions["left"] == 1){translate2dX(elemento, -elemento.speed)}
         if(elemento.directions["right"] == 1){translate2dX(elemento, elemento.speed)}
+        if(elemento.directions["Q"] == 1){upingMove(elemento, elemento.speed)}
     })
 
 }
@@ -189,6 +217,29 @@ function translate2dY(elemento, dist){
 }
 
 
+//cada movimento adicionado vai ser um obj
+function upingMove(el, speed ){
+
+  
+    if(el.moveStates.hasOwnProperty("jumping")){
+        
+    }else{
+
+    }
+      
+     
+}
+
+
+
+
+
+
+
+
+
+
+//animacao
 function drawSquare(obj){
 
     var x = obj.x;
@@ -248,6 +299,21 @@ function incrementAnimationActionState(obj, currentAnimationState){
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//colisao
 function checkCollide(obj, alvo){    
     var raioA = raioMenor(obj.width, obj.height);
     var raioB = raioMenor(alvo.width, alvo.height);
@@ -277,6 +343,20 @@ function distanciaAB( x1, x2, y1, y2){
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+//init
 function initCanvas(){
     canvas = document.getElementById('canvas');
     canvasContext = canvas.getContext('2d');
@@ -364,16 +444,6 @@ function animate(){
 
 
 </script>
-
-
-
-
-
-
-
-
-
-
 
 
 <body>

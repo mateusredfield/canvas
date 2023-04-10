@@ -42,6 +42,55 @@
     console.log(naosei);
 
 
+
+idleState2 = {
+    x: 200,
+    y: 100,
+    width: 100,
+    height: 100,
+    directions: {
+        "none" : 1, 
+        "up" : 0, 
+        "down" : 0, 
+        "left": 0,
+        "right": 0,
+        "Q" : 0
+    }, 
+    speed: 5
+    }
+
+
+//esse obj eh diferente e deve receber os bounds alem de ser dinamica pois muda conforme o jogo   
+grounds = [];
+
+class idleState{
+
+    constructor(obj){
+        
+        this.x = obj.x
+        this.y = obj.y
+        this.width = obj.width
+        this.height = obj.height
+        this.directions = {
+            "none" : obj.directions.none, 
+            "up" : obj.directions.up, 
+            "down" : obj.directions.down, 
+            "left": obj.directions.left,
+            "right": obj.directions.right,
+            "Q" : obj.directions.Q
+        } 
+        this.speed = obj.speed
+    }
+}
+
+
+var idleState3 = new idleState(idleState2);
+idleState2.x = 99
+
+console.log( idleState3 )
+console.log( idleState2 )
+
+
     // window.addEventListener('load',init)
     // function init(){
 
