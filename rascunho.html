@@ -318,7 +318,17 @@ function checkCollide(obj, alvo){
 
 //parei aqui
 function checkCollideGround(obj, alvo){    
-    
+    var xo = (obj.x + obj.width)/2;
+    var yo = (obj.y + obj.height)/2;
+    var xa = (alvo.x + alvo.width)/2;
+    var ya = (alvo.y + alvo.height)/2;
+    if( xo >= xa  && xo <= xa + alvo.width){
+        if(yo + raio(obj.x, obj.y) ==  ya ){
+            console.lgo("colidiu com um ground");
+            return;
+        }
+    }
+    return 1; 
 }
 
 function checkCollideAllCirc(obj, objs){
