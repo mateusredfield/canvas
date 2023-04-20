@@ -103,7 +103,26 @@ idleState2 = {
 }
 
 
-groundables = [];
+ground = {
+    x: 0,
+    y: 200,
+    width: 1000,
+    height: 100,
+    directions: {
+        "none" : 1, 
+        "up" : 0, 
+        "down" : 0, 
+        "left": 0,
+        "right": 0,
+        "Q" : 0
+    }, 
+    speed: 0
+}
+
+
+
+
+groundables = [ground];
 
 class idleState{
 
@@ -205,9 +224,12 @@ function translate2dX(elemento, dist){
 } 
 
 function translate2dY(elemento, dist){
+    var end = 0;
     elemento.y = elemento.y  + dist;
-    if( !checkCollideAllCirc(elemento, externos)) return 1;
-    elemento.y = elemento.y - dist;
+    if( checkCollideAllCirc(elemento, externos))
+        elemento.y = elemento.y - dist;
+    if( checkCollideAllGrounds(elemento, groundables)) 
+        elemento.y = elemento.y - dist;
 }
 
 
@@ -312,23 +334,27 @@ function checkCollide(obj, alvo){
     var raioA = raioMenor(obj.width, obj.height);
     var raioB = raioMenor(alvo.width, alvo.height);
     var distancia = distanciaAB(obj.x + obj.width/2, alvo.x + alvo.width/2, obj.y + obj.height/2, alvo.y +alvo.height/2 )
-    console.log(raioA + " " + raioB + " " + distancia);
+    //console.log(raioA + " " + raioB + " " + distancia);
     if(raioA + raioB >= distancia) return 1;
 }
 
-//parei aqui
+//parei aqui - ajustar posicao inicial mais smooth, colisao com os outros grounds, grounds moveis, objs talvez, gravidade fake 
 function checkCollideGround(obj, alvo){    
-    var xo = (obj.x + obj.width)/2;
-    var yo = (obj.y + obj.height)/2;
-    var xa = (alvo.x + alvo.width)/2;
-    var ya = (alvo.y + alvo.height)/2;
-    if( xo >= xa  && xo <= xa + alvo.width){
-        if(yo + raio(obj.x, obj.y) ==  ya ){
-            console.lgo("colidiu com um ground");
-            return;
+    
+    var xaObj = obj.x;
+    var yaObj = obj.y + obj.height;
+
+    console.log("obj"); 
+    console.log(obj);
+    console.log("alvo");
+    console.log(alvo);
+    console.log("============")
+
+    if(alvo.y == obj.y + obj.height ){
+        if(  !((xaObj + obj.width < alvo.x) || (xaObj > alvo.x + alvo.width))  ){
+            return 1;
         }
     }
-    return 1; 
 }
 
 function checkCollideAllCirc(obj, objs){
@@ -415,7 +441,7 @@ function init(){
 
     stageGround = new idleState(idleState1);
     stageGround.x = 0;
-    stageGround.y = canvasHeight * 0.7;
+    stageGround.y = canvasHeight * 0.9;
     stageGround.width = canvasWidth;
     stageGround.height = canvasHeight * 0.3;
     groundables.push(stageGround);
