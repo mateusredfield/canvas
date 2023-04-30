@@ -58,7 +58,7 @@ var idleState1;
 var objs;
 var defaultCanvasWidth = 500;
 var defaultCanvasHeight = 200;
-var dist = 1; 
+const dist = 1; 
 
 
 //adicionados 
@@ -83,6 +83,7 @@ idleState1 = {
         "Q" : 0
     }, 
     speed: 5,
+    gravidade: 1, 
     moveStates:{}
 }
 
@@ -99,7 +100,8 @@ idleState2 = {
         "right": 0,
         "Q" : 0
     }, 
-    speed: 5
+    speed: 5,
+    gravidade: 1
 }
 
 
@@ -141,6 +143,7 @@ class idleState{
             "Q" : obj.directions.Q
         } 
         this.speed = obj.speed
+        this.gravidade = obj.gravidade
     }
 }
 
@@ -246,6 +249,17 @@ function upingMove(el, speed ){
      
 }
 
+function gravidadeFake(allObj){
+
+    for(var i = 0; i < allObj.length; i++){
+        obj.gravidade == 1 ? translate2dY(obj[i], dist) : 1 == 1
+    }
+}
+
+
+
+
+
 
 
 
@@ -338,7 +352,7 @@ function checkCollide(obj, alvo){
     if(raioA + raioB >= distancia) return 1;
 }
 
-//parei aqui - ajustar posicao inicial mais smooth, colisao com os outros grounds, grounds moveis, objs talvez, gravidade fake 
+//parei aqui - testar gravidade, ajustar posicao inicial mais smooth, colisao com os outros grounds, grounds moveis, objs talvez
 function checkCollideGround(obj, alvo){    
     
     var xaObj = obj.x;
@@ -471,6 +485,7 @@ function animate(){
     canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
     
     logics([idleImage.idleState]);//logica de mov
+    gravidadeFake(objs);
 
     var diff = performance.now() - tempo;
     if( (diff) > nubFrameRate){
