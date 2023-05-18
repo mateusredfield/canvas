@@ -124,7 +124,7 @@ ground = {
 
 
 
-groundables = [ground];
+groundables = [];
 
 class idleState{
 
@@ -229,10 +229,19 @@ function translate2dX(elemento, dist){
 function translate2dY(elemento, dist){
     var end = 0;
     elemento.y = elemento.y  + dist;
-    if( checkCollideAllCirc(elemento, externos))
+    if( checkCollideAllCirc(elemento, externos)){
         elemento.y = elemento.y - dist;
-    if( checkCollideAllGrounds(elemento, groundables)) 
-        elemento.y = elemento.y - dist;
+        return;
+    }
+        
+    elemento.y = elemento.y  - dist;
+    if( checkCollideAllGrounds(elemento, groundables, dist)){
+        console.log("void nada haver")
+        console.log(groundables)
+        return;
+    }else{
+        elemento.y = elemento.y  + dist;
+    }
 }
 
 
@@ -252,7 +261,7 @@ function upingMove(el, speed ){
 function gravidadeFake(allObj){
 
     for(var i = 0; i < allObj.length; i++){
-        obj.gravidade == 1 ? translate2dY(obj[i], dist) : 1 == 1
+        allObj[i].gravidade == 1 ? translate2dY(allObj[i], dist) : 0
     }
 }
 
@@ -352,8 +361,8 @@ function checkCollide(obj, alvo){
     if(raioA + raioB >= distancia) return 1;
 }
 
-//parei aqui - testar gravidade, ajustar posicao inicial mais smooth, colisao com os outros grounds, grounds moveis, objs talvez
-function checkCollideGround(obj, alvo){    
+//parei aqui - ajustar posicao inicial mais smooth, colisao com os outros grounds, grounds moveis, objs talvez
+function checkCollideGround(obj, alvo, diff){    
     
     var xaObj = obj.x;
     var yaObj = obj.y + obj.height;
@@ -364,11 +373,13 @@ function checkCollideGround(obj, alvo){
     console.log(alvo);
     console.log("============")
 
-    if(alvo.y == obj.y + obj.height ){
+    if( (obj.y <= alvo.y)  &&  (alvo.y <= obj.y + obj.height + diff) ){
         if(  !((xaObj + obj.width < alvo.x) || (xaObj > alvo.x + alvo.width))  ){
+            console.log("nada haver");
             return 1;
         }
     }
+    return 0;
 }
 
 function checkCollideAllCirc(obj, objs){
@@ -379,10 +390,10 @@ function checkCollideAllCirc(obj, objs){
     
 } 
 
-function checkCollideAllGrounds(obj, objs){
+function checkCollideAllGrounds(obj, objs, diff){
     
     for( var i = 0; i < objs.length; i++ ){
-        if(checkCollideGround(obj, objs[i])) return 1;
+        if(checkCollideGround(obj, objs[i], diff)) return 1;
     }    
 }
 
